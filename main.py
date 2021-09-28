@@ -44,8 +44,14 @@ class Soldier(pygame.sprite.Sprite):
 		self.speed = speed
 		self.direction = 1
 		self.flip = False
-		gameImage = pygame.image.load(f'assets/{self.type}/Idle/0.png')
-		self.playerSprite = pygame.transform.scale(gameImage, (gameImage.get_width() * scale, gameImage.get_height() * scale))
+		self.time = pygame.time.get_ticks()
+		self.animationList = []
+		self.index = 0
+		for c in range(3):
+			gameImage = pygame.image.load(f'assets/{self.type}/Idle/{c}.png')
+			gameImage = pygame.transform.scale(gameImage, (gameImage.get_width() * scale, gameImage.get_height() * scale))
+			self.animationList.append(gameImage)
+		self.playerSprite = self.animationList[0]
 		self.playerRect = self.playerSprite.get_rect()
 		self.playerRect.center = (x, y)
 
@@ -65,6 +71,15 @@ class Soldier(pygame.sprite.Sprite):
 		self.playerRect.x += deltaX
 		self.playerRect.y += deltaY
 
+	def updateAnimation(self):
+		animTime = 100
+		self.playerSprite = self.animationList[self.index]
+		if(pygame.time.get_ticks() - self.time > animTime):
+			self.time = pygame.time.get_ticks()
+			self.index += 1
+		if(self.index >= len(self.animationList)):
+			self.index = 0
+
 
 	def draw(self):
 		gameWindow.blit(pygame.transform.flip(self.playerSprite, self.flip, False), self.playerRect)
@@ -72,14 +87,13 @@ class Soldier(pygame.sprite.Sprite):
 # Game Loop: #
 
 firstSoldier = Soldier('Player', 200, 200, 2, 5)
-secondSoldier = Soldier('Enemy', 300, 300, 2, 5)
 
 while(gameRunning):
 
 	handleFPS.tick(FPS)
 	gameWindow.fill((125, 255, 255))
+	firstSoldier.updateAnimation()
 	firstSoldier.draw()
-	secondSoldier.draw()
 	firstSoldier.move(moveLeft, moveRight)
 
 	# Event Handler:
