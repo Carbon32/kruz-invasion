@@ -47,11 +47,24 @@ class Soldier(pygame.sprite.Sprite):
 		self.time = pygame.time.get_ticks()
 		self.animationList = []
 		self.index = 0
-		for c in range(3):
+		self.action = 0
+
+		# Loading Sprites: #
+		tempList = []
+		for c in range(3): # Loading Idle animations
 			gameImage = pygame.image.load(f'assets/{self.type}/Idle/{c}.png')
 			gameImage = pygame.transform.scale(gameImage, (gameImage.get_width() * scale, gameImage.get_height() * scale))
-			self.animationList.append(gameImage)
-		self.playerSprite = self.animationList[0]
+			tempList.append(gameImage)
+		self.animationList.append(tempList)
+		tempList = []
+		for c in range(3): # Loading Movement animations
+			gameImage = pygame.image.load(f'assets/{self.type}/Move/{c}.png')
+			gameImage = pygame.transform.scale(gameImage, (gameImage.get_width() * scale, gameImage.get_height() * scale))
+			tempList.append(gameImage)
+		self.animationList.append(tempList)
+
+
+		self.playerSprite = self.animationList[self.action][self.index]
 		self.playerRect = self.playerSprite.get_rect()
 		self.playerRect.center = (x, y)
 
@@ -73,13 +86,17 @@ class Soldier(pygame.sprite.Sprite):
 
 	def updateAnimation(self):
 		animTime = 100
-		self.playerSprite = self.animationList[self.index]
+		self.playerSprite = self.animationList[self.action][self.index]
 		if(pygame.time.get_ticks() - self.time > animTime):
 			self.time = pygame.time.get_ticks()
 			self.index += 1
-		if(self.index >= len(self.animationList)):
+		if(self.index >= len(self.animationList[self.action])):
 			self.index = 0
-
+	def updateAction(self, newAction):
+		if(newAction != self.action):
+			self.action = newAction
+			self.index = 0
+			self.time = pygame.time.get_ticks()
 
 	def draw(self):
 		gameWindow.blit(pygame.transform.flip(self.playerSprite, self.flip, False), self.playerRect)
@@ -94,6 +111,10 @@ while(gameRunning):
 	gameWindow.fill((125, 255, 255))
 	firstSoldier.updateAnimation()
 	firstSoldier.draw()
+	if(moveLeft or moveRight):
+		firstSoldier.updateAction(1)
+	else:
+		firstSoldier.updateAction(0)
 	firstSoldier.move(moveLeft, moveRight)
 
 	# Event Handler:
