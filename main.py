@@ -19,6 +19,7 @@ pygame.init()
 gameRunning = True
 moveLeft = False
 moveRight = False
+gameGravity = 0.75
 
 # Game Window: #
 
@@ -42,7 +43,11 @@ class Soldier(pygame.sprite.Sprite):
 		self.x = x
 		self.y = y
 		self.speed = speed
+		self.alive = True
 		self.direction = 1
+		self.jump = False
+		self.inAir = True
+		self.velocityY = 0
 		self.flip = False
 		self.time = pygame.time.get_ticks()
 		self.animationList = []
@@ -50,19 +55,14 @@ class Soldier(pygame.sprite.Sprite):
 		self.action = 0
 
 		# Loading Sprites: #
-		tempList = []
-		for c in range(3): # Loading Idle animations
-			gameImage = pygame.image.load(f'assets/{self.type}/Idle/{c}.png')
-			gameImage = pygame.transform.scale(gameImage, (gameImage.get_width() * scale, gameImage.get_height() * scale))
-			tempList.append(gameImage)
-		self.animationList.append(tempList)
-		tempList = []
-		for c in range(3): # Loading Movement animations
-			gameImage = pygame.image.load(f'assets/{self.type}/Move/{c}.png')
-			gameImage = pygame.transform.scale(gameImage, (gameImage.get_width() * scale, gameImage.get_height() * scale))
-			tempList.append(gameImage)
-		self.animationList.append(tempList)
-
+		animationTypes = ['Idle', 'Move']
+		for animation in animationTypes:
+			tempList = []
+			for c in range(3): # Loading Idle animations
+				gameImage = pygame.image.load(f'assets/{self.type}/{animation}/{c}.png')
+				gameImage = pygame.transform.scale(gameImage, (gameImage.get_width() * scale, gameImage.get_height() * scale))
+				tempList.append(gameImage)
+			self.animationList.append(tempList)
 
 		self.playerSprite = self.animationList[self.action][self.index]
 		self.playerRect = self.playerSprite.get_rect()
@@ -76,10 +76,26 @@ class Soldier(pygame.sprite.Sprite):
 			deltaX = -self.speed
 			self.flip = True
 			self.direction = -1
+
 		if(movingRight):
 			deltaX = self.speed
 			self.flip = False
 			self.direction = 1
+
+		if(self.jump == True and self.inAir == False):
+			self.velocityY = -10
+			self.jump = False
+			self.inAir = True
+
+		self.velocityY += gameGravity
+		if(self.velocityY > 10):
+			self.velocityY = 10
+			self.inAir = False
+		deltaY += self.velocityY
+
+		# Collision:
+		if(self.playerRect.bottom + deltaY > 500):
+			deltaY = 500 - self.playerRect.bottom
 
 		self.playerRect.x += deltaX
 		self.playerRect.y += deltaY
@@ -92,6 +108,7 @@ class Soldier(pygame.sprite.Sprite):
 			self.index += 1
 		if(self.index >= len(self.animationList[self.action])):
 			self.index = 0
+
 	def updateAction(self, newAction):
 		if(newAction != self.action):
 			self.action = newAction
@@ -109,13 +126,15 @@ while(gameRunning):
 
 	handleFPS.tick(FPS)
 	gameWindow.fill((125, 255, 255))
+	pygame.draw.line(gameWindow, (0, 0, 0), (0, 500), (screenWidth, 500))
 	firstSoldier.updateAnimation()
 	firstSoldier.draw()
-	if(moveLeft or moveRight):
-		firstSoldier.updateAction(1)
-	else:
-		firstSoldier.updateAction(0)
-	firstSoldier.move(moveLeft, moveRight)
+	if(firstSoldier.alive):
+		if(moveLeft or moveRight):
+			firstSoldier.updateAction(1)
+		else:
+			firstSoldier.updateAction(0)
+		firstSoldier.move(moveLeft, moveRight)
 
 	# Event Handler:
 	for event in pygame.event.get():
@@ -128,6 +147,8 @@ while(gameRunning):
 				moveRight = True
 			if(event.key == pygame.K_q):
 				moveLeft = True
+			if(event.key == pygame.K_SPACE and firstSoldier.alive):
+				firstSoldier.jump = True
 			if(event.key == pygame.K_ESCAPE):
 				gameRunning = False
 
