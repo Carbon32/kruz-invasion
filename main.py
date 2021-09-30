@@ -20,6 +20,7 @@ gameRunning = True
 moveLeft = False
 moveRight = False
 gameGravity = 0.75
+shoot = False
 
 # Game Window: #
 
@@ -43,6 +44,7 @@ class Soldier(pygame.sprite.Sprite):
 		self.x = x
 		self.y = y
 		self.speed = speed
+		self.shootTimer = 0
 		self.alive = True
 		self.direction = 1
 		self.jump = False
@@ -58,8 +60,8 @@ class Soldier(pygame.sprite.Sprite):
 		animationTypes = ['Idle', 'Move']
 		for animation in animationTypes:
 			tempList = []
-			for c in range(3): # Loading Idle animations
-				gameImage = pygame.image.load(f'assets/{self.type}/{animation}/{c}.png')
+			for c in range(3): # Loading all animations
+				gameImage = pygame.image.load(f'assets/{self.type}/{animation}/{c}.png').convert_alpha()
 				gameImage = pygame.transform.scale(gameImage, (gameImage.get_width() * scale, gameImage.get_height() * scale))
 				tempList.append(gameImage)
 			self.animationList.append(tempList)
@@ -67,6 +69,11 @@ class Soldier(pygame.sprite.Sprite):
 		self.playerSprite = self.animationList[self.action][self.index]
 		self.playerRect = self.playerSprite.get_rect()
 		self.playerRect.center = (x, y)
+
+	def update(self):
+		self.updateAnimation()
+		if(self.shootTimer > 0):
+			self.shootTimer -= 1
 
 
 	def move(self, movingLeft, movingRight):
@@ -115,10 +122,34 @@ class Soldier(pygame.sprite.Sprite):
 			self.index = 0
 			self.time = pygame.time.get_ticks()
 
+	def shoot(self):
+		if(self.shootTimer == 0):
+			self.shootTimer = 20
+			bullet = Bullet(self.playerRect.centerx + (0.4 * self.playerRect.size[0] * self.direction), self.playerRect.centery, self.direction)
+			bulletGroup.add(bullet)
+
 	def draw(self):
 		gameWindow.blit(pygame.transform.flip(self.playerSprite, self.flip, False), self.playerRect)
 
+# Bullet Class: #
+
+class Bullet(pygame.sprite.Sprite):
+	def __init__(self, x, y, direction):
+		pygame.sprite.Sprite.__init__(self)
+		self.speed = 10
+		self.image = pygame.image.load('assets/Bullet.png').convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.center = (x, y)
+		self.direction = direction
+
+	def update(self):
+		self.rect.x += (self.direction * self.speed)
+		if(self.rect.right < 0 or self.rect.left > screenWidth):
+			self.kill
+
 # Game Loop: #
+
+bulletGroup = pygame.sprite.Group()
 
 firstSoldier = Soldier('Player', 200, 200, 2, 5)
 
@@ -127,9 +158,17 @@ while(gameRunning):
 	handleFPS.tick(FPS)
 	gameWindow.fill((125, 255, 255))
 	pygame.draw.line(gameWindow, (0, 0, 0), (0, 500), (screenWidth, 500))
-	firstSoldier.updateAnimation()
+	firstSoldier.update()
 	firstSoldier.draw()
+
+	# Bullets:
+	bulletGroup.update()
+	bulletGroup.draw(gameWindow)
+
 	if(firstSoldier.alive):
+		if(shoot):
+			firstSoldier.shoot()
+
 		if(moveLeft or moveRight):
 			firstSoldier.updateAction(1)
 		else:
@@ -151,12 +190,16 @@ while(gameRunning):
 				firstSoldier.jump = True
 			if(event.key == pygame.K_ESCAPE):
 				gameRunning = False
+			if(event.key == pygame.K_e):
+				shoot = True
 
 		if(event.type == pygame.KEYUP):
 			if(event.key == pygame.K_d):
 				moveRight = False
 			if(event.key == pygame.K_q):
 				moveLeft = False
+			if(event.key == pygame.K_e):
+				shoot = False
 
 
 	pygame.display.update()
