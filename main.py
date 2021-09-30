@@ -38,12 +38,16 @@ FPS = 60
 # Player Class: #
 
 class Soldier(pygame.sprite.Sprite):
-	def __init__(self, type, x, y, scale, speed):
+	def __init__(self, type, x, y, scale, speed, ammo):
 		pygame.sprite.Sprite.__init__(self)
 		self.type = type
+		self.health = 100
+		self.maxHealth = self.health
 		self.x = x
 		self.y = y
 		self.speed = speed
+		self.ammo = ammo
+		self.startAmmo = ammo
 		self.shootTimer = 0
 		self.alive = True
 		self.direction = 1
@@ -57,7 +61,7 @@ class Soldier(pygame.sprite.Sprite):
 		self.action = 0
 
 		# Loading Sprites: #
-		animationTypes = ['Idle', 'Move']
+		animationTypes = ['Idle', 'Move', 'Death']
 		for animation in animationTypes:
 			tempList = []
 			for c in range(3): # Loading all animations
@@ -66,12 +70,13 @@ class Soldier(pygame.sprite.Sprite):
 				tempList.append(gameImage)
 			self.animationList.append(tempList)
 
-		self.playerSprite = self.animationList[self.action][self.index]
-		self.playerRect = self.playerSprite.get_rect()
-		self.playerRect.center = (x, y)
+		self.image = self.animationList[self.action][self.index]
+		self.rect = self.image.get_rect()
+		self.rect.center = (x, y)
 
 	def update(self):
 		self.updateAnimation()
+		self.isAlive()
 		if(self.shootTimer > 0):
 			self.shootTimer -= 1
 
@@ -101,20 +106,23 @@ class Soldier(pygame.sprite.Sprite):
 		deltaY += self.velocityY
 
 		# Collision:
-		if(self.playerRect.bottom + deltaY > 500):
-			deltaY = 500 - self.playerRect.bottom
+		if(self.rect.bottom + deltaY > 500):
+			deltaY = 500 - self.rect.bottom
 
-		self.playerRect.x += deltaX
-		self.playerRect.y += deltaY
+		self.rect.x += deltaX
+		self.rect.y += deltaY
 
 	def updateAnimation(self):
 		animTime = 100
-		self.playerSprite = self.animationList[self.action][self.index]
+		self.image = self.animationList[self.action][self.index]
 		if(pygame.time.get_ticks() - self.time > animTime):
 			self.time = pygame.time.get_ticks()
 			self.index += 1
 		if(self.index >= len(self.animationList[self.action])):
-			self.index = 0
+			if(self.action == 2):
+				self.index = len(self.animationList[self.action]) - 1
+			else:
+				self.index = 0
 
 	def updateAction(self, newAction):
 		if(newAction != self.action):
@@ -122,14 +130,23 @@ class Soldier(pygame.sprite.Sprite):
 			self.index = 0
 			self.time = pygame.time.get_ticks()
 
+	def isAlive(self):
+		if(self.health <= 0):
+			self.health = 0
+			self.speed = 0
+			self.alive = False
+			self.updateAction(2)
+
+
 	def shoot(self):
-		if(self.shootTimer == 0):
+		if(self.shootTimer == 0 and self.ammo > 0):
 			self.shootTimer = 20
-			bullet = Bullet(self.playerRect.centerx + (0.4 * self.playerRect.size[0] * self.direction), self.playerRect.centery, self.direction)
+			bullet = Bullet(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery, self.direction)
 			bulletGroup.add(bullet)
+			self.ammo -= 1
 
 	def draw(self):
-		gameWindow.blit(pygame.transform.flip(self.playerSprite, self.flip, False), self.playerRect)
+		gameWindow.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
 
 # Bullet Class: #
 
@@ -147,33 +164,49 @@ class Bullet(pygame.sprite.Sprite):
 		if(self.rect.right < 0 or self.rect.left > screenWidth):
 			self.kill
 
+		if(pygame.sprite.spritecollide(gamePlayer, bulletGroup, False)):
+			if(gamePlayer.alive):
+				gamePlayer.health -= 5
+				self.kill()
+
+		if(pygame.sprite.spritecollide(gameEnemy, bulletGroup, False)):
+			if(gameEnemy.alive):
+				gameEnemy.health -= 25
+				self.kill()
+
 # Game Loop: #
 
 bulletGroup = pygame.sprite.Group()
 
-firstSoldier = Soldier('Player', 200, 200, 2, 5)
+gamePlayer = Soldier('Player', 100, 0, 2, 5, 7)
+gameEnemy = Soldier('Enemy', 100, 467, 2, 5, 7)
 
 while(gameRunning):
 
 	handleFPS.tick(FPS)
 	gameWindow.fill((125, 255, 255))
 	pygame.draw.line(gameWindow, (0, 0, 0), (0, 500), (screenWidth, 500))
-	firstSoldier.update()
-	firstSoldier.draw()
+
+	# Soldiers:
+	gamePlayer.update()
+	gameEnemy.update()
+
+	gamePlayer.draw()
+	gameEnemy.draw()
 
 	# Bullets:
 	bulletGroup.update()
 	bulletGroup.draw(gameWindow)
 
-	if(firstSoldier.alive):
+	if(gamePlayer.alive):
 		if(shoot):
-			firstSoldier.shoot()
+			gamePlayer.shoot()
 
 		if(moveLeft or moveRight):
-			firstSoldier.updateAction(1)
+			gamePlayer.updateAction(1)
 		else:
-			firstSoldier.updateAction(0)
-		firstSoldier.move(moveLeft, moveRight)
+			gamePlayer.updateAction(0)
+		gamePlayer.move(moveLeft, moveRight)
 
 	# Event Handler:
 	for event in pygame.event.get():
