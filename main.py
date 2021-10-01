@@ -26,7 +26,7 @@ grenadeThrown = False
 
 # Game Window: #
 
-screenWidth = 800
+screenWidth = 1024
 screenHeight = int(screenWidth * 0.8)
 
 gameWindow = pygame.display.set_mode((screenWidth, screenHeight))
@@ -184,6 +184,7 @@ class Grenade(pygame.sprite.Sprite):
 		self.velocityY = -11
 		self.speed = 7
 		self.image = pygame.image.load('assets/Grenade.png').convert_alpha()
+		self.image = pygame.transform.scale(self.image, (25, 25))
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 		self.direction = direction
@@ -193,7 +194,7 @@ class Grenade(pygame.sprite.Sprite):
 		deltaX = self.direction * self.speed 
 		deltaY = self.velocityY
 		if(self.rect.bottom + deltaY > 500):
-			deltaY = 510 - self.rect.bottom
+			deltaY = 507 - self.rect.bottom
 			self.speed = 0
 
 		if(self.rect.left + deltaX < 0 or self.rect.right + deltaX > screenWidth):
@@ -221,8 +222,8 @@ while(gameRunning):
 	gamePlayer.update()
 	gameEnemy.update()
 
-	gamePlayer.draw()
 	gameEnemy.draw()
+	gamePlayer.draw()
 
 	# Bullets & Grenades:
 	bulletGroup.update()
@@ -234,7 +235,7 @@ while(gameRunning):
 		if(shoot):
 			gamePlayer.shoot()
 		elif(throwGrenade and grenadeThrown == False and gamePlayer.grenades > 0):
-			grenade = Grenade(gamePlayer.rect.centerx + (0.5 * gamePlayer.rect.size[0] * gamePlayer.direction), gamePlayer.rect.top, gamePlayer.direction)
+			grenade = Grenade(gamePlayer.rect.centerx, gamePlayer.rect.top, gamePlayer.direction)
 			grenadeGroup.add(grenade)
 			grenadeThrown = True
 			gamePlayer.grenades -= 1
