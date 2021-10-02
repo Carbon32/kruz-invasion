@@ -67,7 +67,7 @@ class Soldier(pygame.sprite.Sprite):
 		animationTypes = ['Idle', 'Move', 'Death']
 		for animation in animationTypes:
 			tempList = []
-			for c in range(3): # Loading all animations
+			for c in range(5): # Loading all animations
 				gameImage = pygame.image.load(f'assets/{self.type}/{animation}/{c}.png').convert_alpha()
 				gameImage = pygame.transform.scale(gameImage, (gameImage.get_width() * scale, gameImage.get_height() * scale))
 				tempList.append(gameImage)
@@ -116,7 +116,7 @@ class Soldier(pygame.sprite.Sprite):
 		self.rect.y += deltaY
 
 	def updateAnimation(self):
-		animTime = 100
+		animTime = 130
 		self.image = self.animationList[self.action][self.index]
 		if(pygame.time.get_ticks() - self.time > animTime):
 			self.time = pygame.time.get_ticks()
@@ -143,8 +143,8 @@ class Soldier(pygame.sprite.Sprite):
 
 	def shoot(self):
 		if(self.shootTimer == 0 and self.ammo > 0):
-			self.shootTimer = 20
-			bullet = Bullet(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery, self.direction)
+			self.shootTimer = 40
+			bullet = Bullet(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery-20, self.direction)
 			bulletGroup.add(bullet)
 			self.ammo -= 1
 
