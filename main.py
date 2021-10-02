@@ -184,7 +184,7 @@ class Grenade(pygame.sprite.Sprite):
 		self.velocityY = -11
 		self.speed = 7
 		self.image = pygame.image.load('assets/Grenade.png').convert_alpha()
-		self.image = pygame.transform.scale(self.image, (25, 25))
+		self.image = pygame.transform.scale(self.image, (10, 10))
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 		self.direction = direction
@@ -194,7 +194,7 @@ class Grenade(pygame.sprite.Sprite):
 		deltaX = self.direction * self.speed 
 		deltaY = self.velocityY
 		if(self.rect.bottom + deltaY > 500):
-			deltaY = 507 - self.rect.bottom
+			deltaY = 500 - self.rect.bottom
 			self.speed = 0
 
 		if(self.rect.left + deltaX < 0 or self.rect.right + deltaX > screenWidth):
