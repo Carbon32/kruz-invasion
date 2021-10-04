@@ -23,6 +23,7 @@ gameGravity = 0.75
 shoot = False
 throwGrenade = False
 grenadeThrown = False
+tileSize = 50
 
 # Game Window: #
 
@@ -144,7 +145,7 @@ class Soldier(pygame.sprite.Sprite):
 	def shoot(self):
 		if(self.shootTimer == 0 and self.ammo > 0):
 			self.shootTimer = 40
-			bullet = Bullet(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery-20, self.direction)
+			bullet = Bullet(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery-30, self.direction)
 			bulletGroup.add(bullet)
 			self.ammo -= 1
 
@@ -172,10 +173,11 @@ class Bullet(pygame.sprite.Sprite):
 				gamePlayer.health -= 5
 				self.kill()
 
-		if(pygame.sprite.spritecollide(gameEnemy, bulletGroup, False)):
-			if(gameEnemy.alive):
-				gameEnemy.health -= 25
-				self.kill()
+		for enemy in enemyGroup:
+			if(pygame.sprite.spritecollide(enemy, bulletGroup, False)):
+				if(enemy.alive):
+					enemy.health -= 25
+					self.kill()
 
 class Grenade(pygame.sprite.Sprite):
 	def __init__(self, x, y, direction):
@@ -209,6 +211,11 @@ class Grenade(pygame.sprite.Sprite):
 			self.kill()
 			explosion = Explosion(self.rect.x, self.rect.y)
 			explosionGroup.add(explosion)
+			if abs((self.rect.centerx - gamePlayer.rect.centerx) < tileSize * 2 and (self.rect.centery - gamePlayer.rect.centery) < tileSize * 2):
+				gamePlayer.health -= 50
+			for enemy in enemyGroup:
+				if abs((self.rect.centerx - enemy.rect.centerx) < tileSize * 2 and (self.rect.centery - enemy.rect.centery) < tileSize * 2):
+					enemy.health -= 100
 
 class Explosion(pygame.sprite.Sprite):
 	def __init__(self, x, y):
@@ -242,9 +249,11 @@ class Explosion(pygame.sprite.Sprite):
 bulletGroup = pygame.sprite.Group()
 grenadeGroup = pygame.sprite.Group()
 explosionGroup = pygame.sprite.Group()
+enemyGroup = pygame.sprite.Group()
 
 gamePlayer = Soldier('Player', 100, 0, 3, 5, 7, 3)
-gameEnemy = Soldier('Enemy', 100, 467, 3, 5, 7, 0)
+gameEnemy = Soldier('Enemy', 100, 455, 3, 5, 7, 0)
+enemyGroup.add(gameEnemy)
 
 while(gameRunning):
 
