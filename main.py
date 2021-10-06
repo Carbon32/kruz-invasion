@@ -38,6 +38,18 @@ pygame.display.set_caption("Kruz Invasion:")
 handleFPS = pygame.time.Clock()
 FPS = 60
 
+# Pickups: #
+
+healthPickup = pygame.image.load('assets/Pickups/Health_Pickup.png').convert_alpha()
+grenadePickup = pygame.image.load('assets/Pickups/Grenade_Pickup.png').convert_alpha()
+bulletPickup = pygame.image.load('assets/Pickups/Bullet_Pickup.png').convert_alpha()
+
+pickups = {
+	'Health'	: healthPickup,
+	'Grenade'	: grenadePickup,
+	'Bullets'	: bulletPickup
+}
+
 # Player Class: #
 
 class Soldier(pygame.sprite.Sprite):
@@ -152,6 +164,19 @@ class Soldier(pygame.sprite.Sprite):
 	def draw(self):
 		gameWindow.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
 
+
+# Pickup Class: #
+
+class Pickup(pygame.sprite.Sprite):
+	def __init__(self, type, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.type = type
+		self.image = pickups[self.type]
+		self.rect = self.image.get_rect()
+		self.rect.midtop = (x + tileSize // 2, y + (tileSize - self.image.get_height()))
+
+
+
 # Bullet Class: #
 
 class Bullet(pygame.sprite.Sprite):
@@ -250,6 +275,8 @@ bulletGroup = pygame.sprite.Group()
 grenadeGroup = pygame.sprite.Group()
 explosionGroup = pygame.sprite.Group()
 enemyGroup = pygame.sprite.Group()
+gamePickups = pygame.sprite.Group()
+
 
 gamePlayer = Soldier('Player', 100, 0, 3, 5, 7, 3)
 gameEnemy = Soldier('Enemy', 100, 455, 3, 5, 7, 0)
@@ -272,9 +299,11 @@ while(gameRunning):
 	bulletGroup.update()
 	grenadeGroup.update()
 	explosionGroup.update()
+	gamePickups.update()
 	bulletGroup.draw(gameWindow)
 	grenadeGroup.draw(gameWindow)
 	explosionGroup.draw(gameWindow)
+	gamePickups.draw(gameWindow)
 
 	if(gamePlayer.alive):
 		if(shoot):
