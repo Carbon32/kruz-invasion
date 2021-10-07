@@ -9,6 +9,7 @@
 # Imports: #
 
 import pygame
+import random
 
 # Pygame Initialization: #
 
@@ -72,6 +73,7 @@ class Soldier(pygame.sprite.Sprite):
 		self.ammo = ammo
 		self.startAmmo = ammo
 		self.shootTimer = 0
+		self.moveCounter = 0
 		self.grenades = grenades
 		self.alive = True
 		self.direction = 1
@@ -83,6 +85,8 @@ class Soldier(pygame.sprite.Sprite):
 		self.animationList = []
 		self.index = 0
 		self.action = 0
+		self.idle = False
+		self.idleCounter = 0
 
 		# Loading Sprites: #
 		animationTypes = ['Idle', 'Move', 'Death']
@@ -135,6 +139,31 @@ class Soldier(pygame.sprite.Sprite):
 
 		self.rect.x += deltaX
 		self.rect.y += deltaY
+
+	def handleAI(self):
+		if(self.alive and gamePlayer.alive):
+			if(self.idle == False and random.randint(1, 512) == 6):
+				self.updateAction(0)
+				self.idle = True
+				self.idleCounter = 50
+
+			if(self.idle == False):
+				if(self.direction == 1):
+					aiRight = True
+				else:
+					aiRight = False
+				aiLeft = not aiRight
+				self.move(aiLeft, aiRight)
+				self.updateAction(1)
+				self.moveCounter += 1
+				if(self.moveCounter > tileSize):
+					self.direction *= -1
+					self.moveCounter *= -1
+			else:
+				self.idleCounter -= 1
+				if(self.idleCounter <= 0):
+					self.idle = False
+
 
 	def updateAnimation(self):
 		animTime = 130
@@ -314,8 +343,8 @@ ammoPickup = Pickup('Bullets', 300, 450)
 gamePickups.add(ammoPickup)
 
 
-gamePlayer = Soldier('Player', 100, 0, 3, 5, 7, 3)
-gameEnemy = Soldier('Enemy', 100, 455, 3, 5, 7, 0)
+gamePlayer = Soldier('Player', 100, 0, 2, 5, 7, 3)
+gameEnemy = Soldier('Enemy', 400, 455, 2, 1, 7, 0)
 enemyGroup.add(gameEnemy)
 
 healthBar = HBar(30, 70)
@@ -323,26 +352,35 @@ healthBar = HBar(30, 70)
 while(gameRunning):
 	handleFPS.tick(FPS)
 	gameWindow.fill((125, 255, 255))
+	pygame.draw.line(gameWindow, (0, 0, 0), (0, 500), (screenWidth, 500))
+
+	# User Information:
 	drawText(f'Ammo: {gamePlayer.ammo}', (0, 0, 0), 30, 20)
 	drawText(f'Grenades: {gamePlayer.grenades}', (0, 0, 0), 150, 20)
 	healthBar.draw(gamePlayer.health)
-	pygame.draw.line(gameWindow, (0, 0, 0), (0, 500), (screenWidth, 500))
 
-	# Soldiers:
+	# Player:
 	gamePlayer.update()
-	gameEnemy.update()
-
-	gameEnemy.draw()
 	gamePlayer.draw()
+
+	# Enemies:
+	for enemy in enemyGroup:
+		enemy.handleAI()
+		enemy.update()
+		enemy.draw()
 
 	# Bullets & Grenades:
 	bulletGroup.update()
 	grenadeGroup.update()
-	explosionGroup.update()
-	gamePickups.update()
 	bulletGroup.draw(gameWindow)
 	grenadeGroup.draw(gameWindow)
+
+	# Game Explosions: 
+	explosionGroup.update()
 	explosionGroup.draw(gameWindow)
+
+	# Game Pickups: 
+	gamePickups.update()
 	gamePickups.draw(gameWindow)
 
 	if(gamePlayer.alive):
