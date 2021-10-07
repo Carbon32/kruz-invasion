@@ -87,6 +87,7 @@ class Soldier(pygame.sprite.Sprite):
 		self.action = 0
 		self.idle = False
 		self.idleCounter = 0
+		self.enemyVision = pygame.Rect(0, 0, 200, 20)
 
 		# Loading Sprites: #
 		animationTypes = ['Idle', 'Move', 'Death']
@@ -146,24 +147,27 @@ class Soldier(pygame.sprite.Sprite):
 				self.updateAction(0)
 				self.idle = True
 				self.idleCounter = 50
-
-			if(self.idle == False):
-				if(self.direction == 1):
-					aiRight = True
-				else:
-					aiRight = False
-				aiLeft = not aiRight
-				self.move(aiLeft, aiRight)
-				self.updateAction(1)
-				self.moveCounter += 1
-				if(self.moveCounter > tileSize):
-					self.direction *= -1
-					self.moveCounter *= -1
+			if(self.enemyVision.colliderect(gamePlayer.rect)):
+				self.updateAction(0)
+				self.shoot()
 			else:
-				self.idleCounter -= 1
-				if(self.idleCounter <= 0):
-					self.idle = False
-
+				if(self.idle == False):
+					if(self.direction == 1):
+						aiRight = True
+					else:
+						aiRight = False
+					aiLeft = not aiRight
+					self.move(aiLeft, aiRight)
+					self.updateAction(1)
+					self.moveCounter += 1
+					self.enemyVision.center = (self.rect.centerx + 100 * self.direction, self.rect.centery)
+					if(self.moveCounter > tileSize):
+						self.direction *= -1
+						self.moveCounter *= -1
+				else:
+					self.idleCounter -= 1
+					if(self.idleCounter <= 0):
+						self.idle = False
 
 	def updateAnimation(self):
 		animTime = 130
@@ -194,7 +198,7 @@ class Soldier(pygame.sprite.Sprite):
 	def shoot(self):
 		if(self.shootTimer == 0 and self.ammo > 0):
 			self.shootTimer = 40
-			bullet = Bullet(self.rect.centerx + (0.7 * self.rect.size[0] * self.direction), self.rect.centery-30, self.direction)
+			bullet = Bullet(self.rect.centerx + (0.9 * self.rect.size[0] * self.direction), self.rect.centery-10, self.direction)
 			bulletGroup.add(bullet)
 			self.ammo -= 1
 
@@ -344,7 +348,7 @@ gamePickups.add(ammoPickup)
 
 
 gamePlayer = Soldier('Player', 100, 0, 2, 5, 7, 3)
-gameEnemy = Soldier('Enemy', 400, 455, 2, 1, 7, 0)
+gameEnemy = Soldier('Enemy', 400, 450, 2, 1, 24, 0)
 enemyGroup.add(gameEnemy)
 
 healthBar = HBar(30, 70)
