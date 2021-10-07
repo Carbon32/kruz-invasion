@@ -64,6 +64,8 @@ def drawText(text, color, x, y):
 class Soldier(pygame.sprite.Sprite):
 	def __init__(self, type, x, y, scale, speed, ammo, grenades):
 		pygame.sprite.Sprite.__init__(self)
+
+		# Soldier Init Variables: 
 		self.type = type
 		self.health = 100
 		self.maxHealth = self.health
@@ -72,19 +74,27 @@ class Soldier(pygame.sprite.Sprite):
 		self.speed = speed
 		self.ammo = ammo
 		self.startAmmo = ammo
-		self.shootTimer = 0
-		self.moveCounter = 0
 		self.grenades = grenades
 		self.alive = True
+
+		# Soldier Timers:
+		self.shootTimer = 0
+		self.time = pygame.time.get_ticks()
+
+		# Soldier Movement Variables:
 		self.direction = 1
 		self.jump = False
 		self.inAir = True
 		self.velocityY = 0
+
+		# Soldier Animation Variables:
 		self.flip = False
-		self.time = pygame.time.get_ticks()
 		self.animationList = []
 		self.index = 0
 		self.action = 0
+
+		# Soldier AI Variables:
+		self.moveCounter = 0
 		self.idle = False
 		self.idleCounter = 0
 		self.enemyVision = pygame.Rect(0, 0, 200, 20)
@@ -108,7 +118,6 @@ class Soldier(pygame.sprite.Sprite):
 		self.isAlive()
 		if(self.shootTimer > 0):
 			self.shootTimer -= 1
-
 
 	def move(self, movingLeft, movingRight):
 		deltaX = 0
@@ -324,7 +333,7 @@ class Explosion(pygame.sprite.Sprite):
 		self.timer = 0
 
 	def update(self):
-		explosionSpeed = 7
+		explosionSpeed = 3
 		self.timer += 1
 		if(self.timer >= explosionSpeed):
 			self.timer = 0
@@ -335,30 +344,37 @@ class Explosion(pygame.sprite.Sprite):
 				self.image = self.explosions[self.index]
 
 
-# Game Loop: #
+# Game Creations: #
 
+# Groups: 
 bulletGroup = pygame.sprite.Group()
 grenadeGroup = pygame.sprite.Group()
 explosionGroup = pygame.sprite.Group()
 enemyGroup = pygame.sprite.Group()
 gamePickups = pygame.sprite.Group()
 
+# Pickups:
 ammoPickup = Pickup('Bullets', 300, 450)
 gamePickups.add(ammoPickup)
 
-
+# Player:
 gamePlayer = Soldier('Player', 100, 0, 2, 5, 7, 3)
+
+# Enemy:
 gameEnemy = Soldier('Enemy', 400, 450, 2, 1, 24, 0)
 enemyGroup.add(gameEnemy)
 
+# User Interface:
 healthBar = HBar(30, 70)
+
+# Game Loop: #
 
 while(gameRunning):
 	handleFPS.tick(FPS)
 	gameWindow.fill((125, 255, 255))
 	pygame.draw.line(gameWindow, (0, 0, 0), (0, 500), (screenWidth, 500))
 
-	# User Information:
+	# User Interface:
 	drawText(f'Ammo: {gamePlayer.ammo}', (0, 0, 0), 30, 20)
 	drawText(f'Grenades: {gamePlayer.grenades}', (0, 0, 0), 150, 20)
 	healthBar.draw(gamePlayer.health)
