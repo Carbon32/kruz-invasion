@@ -5,4 +5,5 @@ This is a video game based in late World War II, you play as a soldier trying to
 
 # Game Art:
 
-Player: David Harrington (collected from: https://opengameart.org)
+The sprite used for player & enemies: David Harrington (collected from: https://opengameart.org)
+The explosions: XYEzawr (collected from: https://itch.io)
