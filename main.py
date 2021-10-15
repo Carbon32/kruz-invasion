@@ -10,6 +10,7 @@
 
 import pygame
 import random
+import os
 
 # Pygame Initialization: #
 
@@ -103,7 +104,8 @@ class Soldier(pygame.sprite.Sprite):
 		animationTypes = ['Idle', 'Move', 'Death']
 		for animation in animationTypes:
 			tempList = []
-			for c in range(5): # Loading all animations
+			framesNumber = len(os.listdir(f'assets/{self.type}/{animation}'))
+			for c in range(framesNumber): # Loading all animations
 				gameImage = pygame.image.load(f'assets/{self.type}/{animation}/{c}.png').convert_alpha()
 				gameImage = pygame.transform.scale(gameImage, (gameImage.get_width() * scale, gameImage.get_height() * scale))
 				tempList.append(gameImage)
@@ -358,7 +360,7 @@ ammoPickup = Pickup('Bullets', 300, 450)
 gamePickups.add(ammoPickup)
 
 # Player:
-gamePlayer = Soldier('Player', 100, 0, 2, 5, 7, 3)
+gamePlayer = Soldier('Player', 100, 0, 3, 5, 7, 3)
 
 # Enemy:
 gameEnemy = Soldier('Enemy', 400, 450, 2, 1, 24, 0)
