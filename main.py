@@ -209,7 +209,7 @@ class Soldier(pygame.sprite.Sprite):
 	def shoot(self):
 		if(self.shootTimer == 0 and self.ammo > 0):
 			self.shootTimer = 40
-			bullet = Bullet(self.rect.centerx + (0.9 * self.rect.size[0] * self.direction), self.rect.centery-10, self.direction)
+			bullet = Bullet(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery+10, self.direction)
 			bulletGroup.add(bullet)
 			self.ammo -= 1
 
@@ -236,7 +236,7 @@ class Pickup(pygame.sprite.Sprite):
 				if(gamePlayer.health > gamePlayer.maxHealth):
 					gamePlayer.health = maxHealth
 			elif(self.type == 'Grenade'):
-				gamePlayer.grenades += 1
+				gamePlayer.grenades += 3
 			self.kill()
 
 # Health Bar: #
@@ -323,15 +323,15 @@ class Explosion(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
 		self.explosions = []
-		for c in range(5):
-			image = pygame.image.load(f'assets/Explosion/{c}.png').convert_alpha()
-			image = pygame.transform.scale(image, (int(image.get_width() * 3), int(image.get_height() * 3)))
+		for c in range(19):
+			image = pygame.image.load(f'assets/Explosion/{c}.png')
+			image = pygame.transform.scale(image, (int(image.get_width() * 5), int(image.get_height() * 5)))
 			self.explosions.append(image)
 		self.index = 0
 		self.image = self.explosions[self.index]
 		self.rect = self.image.get_rect()
-		self.rect.x = x
-		self.rect.y = 420 # Pff quick fix
+		self.rect.x = x-250
+		self.rect.y = 150 # Pff quick fix
 		self.timer = 0
 
 	def update(self):
@@ -356,14 +356,14 @@ enemyGroup = pygame.sprite.Group()
 gamePickups = pygame.sprite.Group()
 
 # Pickups:
-ammoPickup = Pickup('Bullets', 300, 450)
-gamePickups.add(ammoPickup)
+grenadePickup = Pickup('Grenade', 300, 450)
+gamePickups.add(grenadePickup)
 
 # Player:
-gamePlayer = Soldier('Player', 100, 0, 3, 5, 7, 3)
+gamePlayer = Soldier('Player', 100, 0, 3, 4, 7, 3)
 
 # Enemy:
-gameEnemy = Soldier('Enemy', 400, 450, 2, 1, 24, 0)
+gameEnemy = Soldier('Enemy', 400, 450, 3, 1, 24, 0)
 enemyGroup.add(gameEnemy)
 
 # User Interface:
