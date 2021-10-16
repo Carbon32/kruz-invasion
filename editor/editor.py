@@ -33,7 +33,7 @@ editorRunning = True
 editorRows = 16
 editorColumns = 150
 tileSize = screenHeight // editorRows
-editorTiles = 19
+editorTiles = 23
 level = 0
 thisTile = 0
 scrollLeft = False
@@ -85,8 +85,10 @@ for c in range(editorTiles):
 
 saveButton = pygame.image.load('assets/Save.png').convert_alpha()
 loadButton = pygame.image.load('assets/Load.png').convert_alpha()
+resetButton = pygame.image.load('assets/Reset.png').convert_alpha()
 saveButton = pygame.transform.scale(saveButton, (saveButton.get_width() * 5, saveButton.get_height() * 5))
 loadButton = pygame.transform.scale(loadButton, (loadButton.get_width() * 5, loadButton.get_height() * 5))
+resetButton = pygame.transform.scale(resetButton, (resetButton.get_width() * 5, resetButton.get_height() * 5))
 
 # Editor Font: #
 
@@ -125,7 +127,6 @@ def drawBackground():
 # Draw Grid: #
 
 def drawGrid():
-
 	for c in range(editorColumns + 1):
 		pygame.draw.line(editorWindow, ((255, 255, 255)), (c * tileSize - scroll, 0), (c * tileSize - scroll, screenHeight))
 
@@ -145,6 +146,7 @@ def drawWorld():
 
 buttonSave = Button(screenWidth // 2, screenHeight + lowerMargin - 120, saveButton, 1)
 butttonLoad = Button(screenWidth // 2 + 200, screenHeight + lowerMargin - 120, loadButton, 1)
+buttonReset = Button(screenWidth // 2 +  400, screenHeight + lowerMargin - 120, resetButton, 1)
 
 buttonList = []
 buttonColumn = 0
@@ -185,6 +187,14 @@ while editorRunning:
 			for x, row in enumerate(reader):
 				for y, tile in enumerate(row):
 					worldData[x][y] = int(tile)
+
+	if buttonReset.draw():
+		worldData = []
+		for row in range(editorRows):
+			r = [-1] * editorColumns
+			worldData.append(r)
+		for tile in range(0, editorColumns):
+			worldData[editorRows - 1][tile] = 0
 				
 	# Draw Tiles: 
 	pygame.draw.rect(editorWindow, ((123, 15, 16)), (screenWidth, 0, sideMargin, screenHeight))
