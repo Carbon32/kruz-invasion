@@ -11,6 +11,7 @@
 import pygame
 import random
 import os
+import csv
 
 # Pygame Initialization: #
 
@@ -18,19 +19,27 @@ pygame.init()
 
 # Game Variables: #
 
+screenWidth = 1024
+screenHeight = int(screenWidth * 0.8)
+
 gameRunning = True
+
 moveLeft = False
 moveRight = False
+
 gameGravity = 0.75
+
 shoot = False
 throwGrenade = False
 grenadeThrown = False
-tileSize = 50
+
+levelRows = 16
+levelColumns = 150
+tileSize = screenHeight // levelRows
+gameTiles = 24
+gameLevel = 1
 
 # Game Window: #
-
-screenWidth = 1024
-screenHeight = int(screenWidth * 0.8)
 
 gameWindow = pygame.display.set_mode((screenWidth, screenHeight))
 pygame.display.set_caption("Kruz Invasion:")
@@ -51,6 +60,14 @@ pickups = {
 	'Grenade'	: grenadePickup,
 	'Bullets'	: bulletPickup
 }
+
+# Tiles: #
+
+allTiles = []
+for c in range(gameTiles):
+	image = pygame.image.load(f'assets/Tiles/{c}.png')
+	image = pygame.transform.scale(image, (tileSize, tileSize))
+	allTiles.append(image)
 
 # Text: #
 
@@ -216,6 +233,93 @@ class Soldier(pygame.sprite.Sprite):
 	def draw(self):
 		gameWindow.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
 
+# World Class: #
+
+class World():
+	def __init__(self):
+		self.obstacleList = []
+
+	def processData(self, data):
+		for y, row in enumerate(data):
+			for x, t in enumerate(row):
+				if(t >= 0):
+					tile = allTiles[t]
+					tileRect = tile.get_rect()
+					tileRect.x = x * tileSize
+					tileRect.y = y * tileSize
+					tileData = (tile, tileRect)
+					if(t >= 0 and t <= 8):
+						self.obstacleList.append(tileData)
+					elif(t == 10):
+						chemicals = Chemicals(tile, x * tileSize, y * tileSize)
+						chemicalsGroup.add(chemicals)
+
+					elif(t == 9 or t == 11):
+						object = Object(tile, x * tileSize, y * tileSize)
+						gameObjects.add(object)
+
+					elif(t == 19):
+						# Player:
+						gamePlayer = Soldier('Player', x * tileSize, y * tileSize, 3, 4, 7, 3)
+						# Health Bar:
+						healthBar = HBar(30, 70)
+
+					elif(t == 16):
+						# Enemy:
+						gameEnemy = Soldier('Enemy', x * tileSize, y * tileSize, 3, 1, 24, 0)
+						enemyGroup.add(gameEnemy)
+
+					# Pickups:
+					elif(t == 21):
+						ammoPickup = Pickup('Ammo', x * tileSize, y * tileSize)
+						gamePickups.add(ammoPickup)
+
+					elif(t == 22):
+						grenadePickup = Pickup('Grenade', x * tileSize, y * tileSize)
+						gamePickups.add(grenadePickup)
+
+					elif(t == 23):
+						healthPickup = Pickup('Health', x * tileSize, y * tileSize)
+						gamePickups.add(healthPickup)
+
+					# Exit: 
+					elif(t == 17):
+						exit = Exit(tile, x * tileSize, y * tileSize)
+						gameExits.add(exit)
+		return gamePlayer, healthBar
+
+	def draw(self):
+		for tile in self.obstacleList:
+			gameWindow.blit(tile[0], tile[1])
+
+
+
+# Exit Class: #
+
+class Exit(pygame.sprite.Sprite):
+	def __init__(self, image, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = image
+		self.rect = self.image.get_rect()
+		self.rect.midtop = (x + tileSize // 2, y + (tileSize - self.image.get_height()))
+
+# Objects Class: #
+
+class Object(pygame.sprite.Sprite):
+	def __init__(self, image, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = image
+		self.rect = self.image.get_rect()
+		self.rect.midtop = (x + tileSize // 2, y + (tileSize - self.image.get_height()))
+
+# Chemicals Class: #
+
+class Chemicals(pygame.sprite.Sprite):
+	def __init__(self, image, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = image
+		self.rect = self.image.get_rect()
+		self.rect.midtop = (x + tileSize // 2, y + (tileSize - self.image.get_height()))
 
 # Pickup Class: #
 
@@ -345,7 +449,6 @@ class Explosion(pygame.sprite.Sprite):
 			else:
 				self.image = self.explosions[self.index]
 
-
 # Game Creations: #
 
 # Groups: 
@@ -353,29 +456,36 @@ bulletGroup = pygame.sprite.Group()
 grenadeGroup = pygame.sprite.Group()
 explosionGroup = pygame.sprite.Group()
 enemyGroup = pygame.sprite.Group()
+chemicalsGroup = pygame.sprite.Group()
 gamePickups = pygame.sprite.Group()
-
-# Pickups:
-grenadePickup = Pickup('Grenade', 300, 450)
-gamePickups.add(grenadePickup)
+gameObjects = pygame.sprite.Group()
+gameExits = pygame.sprite.Group()
 
 # Player:
-gamePlayer = Soldier('Player', 100, 0, 3, 4, 7, 3)
 
-# Enemy:
-gameEnemy = Soldier('Enemy', 400, 450, 3, 1, 24, 0)
-enemyGroup.add(gameEnemy)
+gamePlayer = Soldier('Player', 0, 0, 0, 0, 0, 0)
 
-# User Interface:
-healthBar = HBar(30, 70)
+# Levels:
+worldData = []
+for r in range(levelRows):
+	row = [-1] * levelColumns
+	worldData.append(row)
+
+with open(f'levels/level{gameLevel}_data.csv', newline='') as csvfile:
+	reader = csv.reader(csvfile, delimiter=',')
+	for x, row in enumerate(reader):
+		for y, tile in enumerate(row):
+			worldData[x][y] = int(tile)
+
+gameWorld = World()
+gamePlayer, healthBar = gameWorld.processData(worldData)
 
 # Game Loop: #
 
 while(gameRunning):
 	handleFPS.tick(FPS)
 	gameWindow.fill((125, 255, 255))
-	pygame.draw.line(gameWindow, (0, 0, 0), (0, 500), (screenWidth, 500))
-
+	gameWorld.draw()
 	# User Interface:
 	drawText(f'Ammo: {gamePlayer.ammo}', (0, 0, 0), 30, 20)
 	drawText(f'Grenades: {gamePlayer.grenades}', (0, 0, 0), 150, 20)
@@ -404,6 +514,21 @@ while(gameRunning):
 	# Game Pickups: 
 	gamePickups.update()
 	gamePickups.draw(gameWindow)
+
+	# Game Objects:
+
+	gameObjects.update()
+	gameObjects.draw(gameWindow)
+
+	# Chemicals:
+
+	chemicalsGroup.update()
+	chemicalsGroup.draw(gameWindow)
+
+	# Game Exits:
+
+	gameExits.update()
+	gameExits.draw(gameWindow)
 
 	if(gamePlayer.alive):
 		if(shoot):
