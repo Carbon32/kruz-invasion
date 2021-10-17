@@ -33,7 +33,7 @@ editorRunning = True
 editorRows = 16
 editorColumns = 150
 tileSize = screenHeight // editorRows
-editorTiles = 23
+editorTiles = 24
 level = 0
 thisTile = 0
 scrollLeft = False
@@ -255,4 +255,3 @@ while editorRunning:
 
 	pygame.display.update()
 pygame.quit()
-
