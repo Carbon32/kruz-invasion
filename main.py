@@ -168,7 +168,7 @@ class Soldier(pygame.sprite.Sprite):
 			self.direction = 1
 
 		if(self.jump == True and self.inAir == False):
-			self.velocityY = -10
+			self.velocityY = -20
 			self.jump = False
 			self.inAir = True
 
@@ -307,7 +307,7 @@ class World():
 						# Health Bar:
 						healthBar = HBar(30, 70)
 
-					elif(t == 16):
+					elif(t == 20):
 						# Enemy:
 						gameEnemy = Soldier('Enemy', x * tileSize, y * tileSize, 3, 1, 24, 0)
 						enemyGroup.add(gameEnemy)
@@ -560,7 +560,7 @@ while(gameRunning):
 	# Background:
 	gameWindow.fill((125, 255, 255))
 	width = sky.get_width()
-	for x in range(5):
+	for x in range(10):
 		gameWindow.blit(sky, ((x * width) - backgroundScroll * 0.5, 0))
 		gameWindow.blit(mountain, ((x * width) - backgroundScroll * 0.7, screenHeight - mountain.get_height() - 300))
 		gameWindow.blit(pineTrees, ((x * width) - backgroundScroll * 0.9, screenHeight - pineTrees.get_height() - 150))
@@ -580,9 +580,9 @@ while(gameRunning):
 
 	# Enemies:
 	for enemy in enemyGroup:
+		enemy.draw()
 		enemy.handleAI()
 		enemy.update()
-		enemy.draw()
 
 	# Bullets & Grenades:
 	bulletGroup.update()
