@@ -39,6 +39,10 @@ tileSize = screenHeight // levelRows
 gameTiles = 24
 gameLevel = 1
 
+scrollThresh = 100
+screenScroll = 0
+backgroundScroll = 0
+
 # Game Window: #
 
 gameWindow = pygame.display.set_mode((screenWidth, screenHeight))
@@ -60,6 +64,15 @@ pickups = {
 	'Grenade'	: grenadePickup,
 	'Bullets'	: bulletPickup
 }
+
+# Background: #
+
+mountain = pygame.image.load('assets/Background/Mountain.png')
+pineTrees = pygame.image.load('assets/Background/Pines.png')
+pineTrees_2 = pygame.image.load('assets/Background/Pines_2.png')
+sky = pygame.image.load('assets/Background/Sky.png')
+
+
 
 # Tiles: #
 
@@ -143,6 +156,7 @@ class Soldier(pygame.sprite.Sprite):
 	def move(self, movingLeft, movingRight):
 		deltaX = 0
 		deltaY = 0
+		screenScroll = 0
 		if(movingLeft):
 			deltaX = -self.speed
 			self.flip = True
@@ -168,6 +182,9 @@ class Soldier(pygame.sprite.Sprite):
 		for tile in gameWorld.obstacleList:
 			if(tile[1].colliderect(self.rect.x + deltaX, self.rect.y, self.width - 20, self.height)):
 				deltaX = 0
+				if(self.type == 'Enemy'):
+					self.direction *= -1
+					self.moveCounter = 0
 
 			if(tile[1].colliderect(self.rect.x, self.rect.y + deltaY, self.width - 20, self.height)):
 				if(self.velocityY < 0):
@@ -179,8 +196,19 @@ class Soldier(pygame.sprite.Sprite):
 					self.inAir = False
 					deltaY = tile[1].top - self.rect.bottom
 
+		if(self.type == 'Player'):
+			if(self.rect.left + deltaX < 0 or self.rect.right + deltaX > screenWidth):
+				deltaX = 0
+
 		self.rect.x += deltaX
 		self.rect.y += deltaY
+
+		if(self.type == 'Player'):
+			if((self.rect.right > screenWidth - scrollThresh and backgroundScroll < (gameWorld.levelLength * tileSize) - screenWidth) or (self.rect.left < scrollThresh and backgroundScroll > abs(deltaX))):
+				self.rect.x -= deltaX
+				screenScroll = -deltaX
+
+		return screenScroll
 
 	def handleAI(self):
 		if(self.alive and gamePlayer.alive):
@@ -209,9 +237,10 @@ class Soldier(pygame.sprite.Sprite):
 					self.idleCounter -= 1
 					if(self.idleCounter <= 0):
 						self.idle = False
+		self.rect.x += screenScroll
 
 	def updateAnimation(self):
-		animTime = 130
+		animTime = 80
 		self.image = self.animationList[self.action][self.index]
 		if(pygame.time.get_ticks() - self.time > animTime):
 			self.time = pygame.time.get_ticks()
@@ -253,6 +282,7 @@ class World():
 		self.obstacleList = []
 
 	def processData(self, data):
+		self.levelLength = len(data[0])
 		for y, row in enumerate(data):
 			for x, t in enumerate(row):
 				if(t >= 0):
@@ -273,7 +303,7 @@ class World():
 
 					elif(t == 19):
 						# Player:
-						gamePlayer = Soldier('Player', x * tileSize, y * tileSize, 3, 4, 7, 3)
+						gamePlayer = Soldier('Player', x * tileSize, y * tileSize, 3, 5, 7, 3)
 						# Health Bar:
 						healthBar = HBar(30, 70)
 
@@ -303,6 +333,7 @@ class World():
 
 	def draw(self):
 		for tile in self.obstacleList:
+			tile[1][0] += screenScroll
 			gameWindow.blit(tile[0], tile[1])
 
 
@@ -316,6 +347,9 @@ class Exit(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.midtop = (x + tileSize // 2, y + (tileSize - self.image.get_height()))
 
+	def update(self):
+		self.rect.x += screenScroll
+
 # Objects Class: #
 
 class Object(pygame.sprite.Sprite):
@@ -325,6 +359,9 @@ class Object(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.midtop = (x + tileSize // 2, y + (tileSize - self.image.get_height()))
 
+	def update(self):
+		self.rect.x += screenScroll
+
 # Chemicals Class: #
 
 class Chemicals(pygame.sprite.Sprite):
@@ -333,6 +370,9 @@ class Chemicals(pygame.sprite.Sprite):
 		self.image = image
 		self.rect = self.image.get_rect()
 		self.rect.midtop = (x + tileSize // 2, y + (tileSize - self.image.get_height()))
+
+	def update(self):
+		self.rect.x += screenScroll
 
 # Pickup Class: #
 
@@ -355,6 +395,7 @@ class Pickup(pygame.sprite.Sprite):
 			elif(self.type == 'Grenade'):
 				gamePlayer.grenades += 3
 			self.kill()
+		self.rect.x += screenScroll
 
 # Health Bar: #
 
@@ -383,7 +424,7 @@ class Bullet(pygame.sprite.Sprite):
 		self.direction = direction
 
 	def update(self):
-		self.rect.x += (self.direction * self.speed)
+		self.rect.x += (self.direction * self.speed) + screenScroll
 		if(self.rect.right < 0 or self.rect.left > screenWidth):
 			self.kill
 		for tile in gameWorld.obstacleList:
@@ -400,6 +441,7 @@ class Bullet(pygame.sprite.Sprite):
 				if(enemy.alive):
 					enemy.health -= 25
 					self.kill()
+
 
 class Grenade(pygame.sprite.Sprite):
 	def __init__(self, x, y, direction):
@@ -437,7 +479,7 @@ class Grenade(pygame.sprite.Sprite):
 			self.direction *= -1
 			deltaX = self.direction * self.speed
 
-		self.rect.x += deltaX
+		self.rect.x += deltaX + screenScroll
 		self.rect.y += deltaY
 
 		self.timer -= 1
@@ -477,6 +519,7 @@ class Explosion(pygame.sprite.Sprite):
 				self.kill()
 			else:
 				self.image = self.explosions[self.index]
+		self.rect.x += screenScroll
 
 # Game Creations: #
 
@@ -513,8 +556,19 @@ gamePlayer, healthBar = gameWorld.processData(worldData)
 
 while(gameRunning):
 	handleFPS.tick(FPS)
+
+	# Background:
 	gameWindow.fill((125, 255, 255))
+	width = sky.get_width()
+	for x in range(5):
+		gameWindow.blit(sky, ((x * width) - backgroundScroll * 0.5, 0))
+		gameWindow.blit(mountain, ((x * width) - backgroundScroll * 0.7, screenHeight - mountain.get_height() - 300))
+		gameWindow.blit(pineTrees, ((x * width) - backgroundScroll * 0.9, screenHeight - pineTrees.get_height() - 150))
+		gameWindow.blit(pineTrees_2, ((x * width) - backgroundScroll * 1, screenHeight - pineTrees_2.get_height()))
+
+	# Game World Creation:
 	gameWorld.draw()
+
 	# User Interface:
 	drawText(f'Ammo: {gamePlayer.ammo}', (0, 0, 0), 30, 20)
 	drawText(f'Grenades: {gamePlayer.grenades}', (0, 0, 0), 150, 20)
@@ -571,7 +625,8 @@ while(gameRunning):
 			gamePlayer.updateAction(1)
 		else:
 			gamePlayer.updateAction(0)
-		gamePlayer.move(moveLeft, moveRight)
+		screenScroll = gamePlayer.move(moveLeft, moveRight)
+		backgroundScroll -= screenScroll
 
 	# Event Handler:
 	for event in pygame.event.get():
