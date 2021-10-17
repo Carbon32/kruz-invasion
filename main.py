@@ -131,6 +131,8 @@ class Soldier(pygame.sprite.Sprite):
 		self.image = self.animationList[self.action][self.index]
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
+		self.width = self.image.get_width()
+		self.height = self.image.get_height()
 
 	def update(self):
 		self.updateAnimation()
@@ -162,9 +164,20 @@ class Soldier(pygame.sprite.Sprite):
 			self.inAir = False
 		deltaY += self.velocityY
 
-		# Collision:
-		if(self.rect.bottom + deltaY > 500):
-			deltaY = 500 - self.rect.bottom
+		# Improved Collision:
+		for tile in gameWorld.obstacleList:
+			if(tile[1].colliderect(self.rect.x + deltaX, self.rect.y, self.width - 20, self.height)):
+				deltaX = 0
+
+			if(tile[1].colliderect(self.rect.x, self.rect.y + deltaY, self.width - 20, self.height)):
+				if(self.velocityY < 0):
+					self.velocityY = 0
+					deltaY = tile[1].bottom - self.rect.top
+
+				elif(self.velocityY >= 0):
+					self.velocityY = 0
+					self.inAir = False
+					deltaY = tile[1].top - self.rect.bottom
 
 		self.rect.x += deltaX
 		self.rect.y += deltaY
@@ -373,6 +386,9 @@ class Bullet(pygame.sprite.Sprite):
 		self.rect.x += (self.direction * self.speed)
 		if(self.rect.right < 0 or self.rect.left > screenWidth):
 			self.kill
+		for tile in gameWorld.obstacleList:
+			if(tile[1].colliderect(self.rect)):
+				self.kill()
 
 		if(pygame.sprite.spritecollide(gamePlayer, bulletGroup, False)):
 			if(gamePlayer.alive):
@@ -392,18 +408,30 @@ class Grenade(pygame.sprite.Sprite):
 		self.velocityY = -11
 		self.speed = 7
 		self.image = pygame.image.load('assets/Grenade.png').convert_alpha()
-		self.image = pygame.transform.scale(self.image, (10, 10))
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
+		self.width = self.image.get_width()
+		self.height = self.image.get_height()
 		self.direction = direction
 
 	def update(self):
 		self.velocityY += gameGravity
 		deltaX = self.direction * self.speed 
 		deltaY = self.velocityY
-		if(self.rect.bottom + deltaY > 500):
-			deltaY = 500 - self.rect.bottom
-			self.speed = 0
+
+		for tile in gameWorld.obstacleList:
+			if(tile[1].colliderect(self.rect.x + deltaX, self.rect.y, self.width, self.height)):
+				self.direction *= -1
+				deltaX = self.direction * self.speed
+			if(tile[1].colliderect(self.rect.x, self.rect.y + deltaY, self.width, self.height)):
+				self.speed = 0
+				if(self.velocityY < 0):
+					self.velocityY = 0
+					deltaY = tile[1].bottom - self.rect.top
+				elif(self.velocityY >= 0):
+					self.velocityY = 0
+					deltaY = tile[1].top - self.rect.bottom
+
 
 		if(self.rect.left + deltaX < 0 or self.rect.right + deltaX > screenWidth):
 			self.direction *= -1
@@ -434,8 +462,9 @@ class Explosion(pygame.sprite.Sprite):
 		self.index = 0
 		self.image = self.explosions[self.index]
 		self.rect = self.image.get_rect()
-		self.rect.x = x-250
-		self.rect.y = 150 # Pff quick fix
+		self.rect.x = x
+		self.rect.y = y
+		self.rect.center = (x, y-80)
 		self.timer = 0
 
 	def update(self):
