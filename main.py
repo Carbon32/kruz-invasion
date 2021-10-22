@@ -27,7 +27,7 @@ gameRunning = True
 moveLeft = False
 moveRight = False
 
-gameGravity = 0.75
+gameGravity = 0.5
 
 shoot = False
 throwGrenade = False
@@ -43,6 +43,8 @@ scrollThresh = 300
 screenScroll = 0
 backgroundScroll = 0
 
+startGame = False
+
 # Game Window: #
 
 gameWindow = pygame.display.set_mode((screenWidth, screenHeight))
@@ -51,7 +53,7 @@ pygame.display.set_caption("Kruz Invasion:")
 # Frame Limiter: #
 
 handleFPS = pygame.time.Clock()
-FPS = 60
+FPS = 120
 
 # Pickups: #
 
@@ -72,7 +74,10 @@ pineTrees = pygame.image.load('assets/Background/Pines.png')
 pineTrees_2 = pygame.image.load('assets/Background/Pines_2.png')
 sky = pygame.image.load('assets/Background/Sky.png')
 
+# Buttons: #
 
+play = pygame.image.load('assets/Buttons/Play.png')
+exit = pygame.image.load('assets/Buttons/Exit.png')
 
 # Tiles: #
 
@@ -174,7 +179,7 @@ class Soldier(pygame.sprite.Sprite):
 
 		self.velocityY += gameGravity
 		if(self.velocityY > 10):
-			self.velocityY = 10
+			self.velocityY = 50
 			self.inAir = False
 		deltaY += self.velocityY
 
@@ -274,6 +279,31 @@ class Soldier(pygame.sprite.Sprite):
 
 	def draw(self):
 		gameWindow.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
+
+# Button Class: #
+
+class Button():
+	def __init__(self, x, y, image, scale):
+		width = image.get_width()
+		height = image.get_height()
+		self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+		self.rect = self.image.get_rect()
+		self.rect.topleft = (x, y)
+		self.clicked = False
+
+	def draw(self):
+		action = False
+		position = pygame.mouse.get_pos()
+		if self.rect.collidepoint(position):
+			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+				action = True
+				self.clicked = True
+
+		if pygame.mouse.get_pressed()[0] == 0:
+			self.clicked = False
+
+		gameWindow.blit(self.image, (self.rect.x, self.rect.y))
+		return action
 
 # World Class: #
 
@@ -523,6 +553,10 @@ class Explosion(pygame.sprite.Sprite):
 
 # Game Creations: #
 
+# Buttons:
+playButton = Button(screenWidth // 2 - 130, screenHeight // 2 - 300, play, 8)
+exitButton = Button(screenWidth // 2 - 130, screenHeight // 2 - 100, exit, 8)
+
 # Groups: 
 bulletGroup = pygame.sprite.Group()
 grenadeGroup = pygame.sprite.Group()
@@ -557,76 +591,85 @@ gamePlayer, healthBar = gameWorld.processData(worldData)
 while(gameRunning):
 	handleFPS.tick(FPS)
 
-	# Background:
-	gameWindow.fill((125, 255, 255))
-	width = sky.get_width()
-	for x in range(10):
-		gameWindow.blit(sky, ((x * width) - backgroundScroll * 0.5, 0))
-		gameWindow.blit(mountain, ((x * width) - backgroundScroll * 0.7, screenHeight - mountain.get_height() - 300))
-		gameWindow.blit(pineTrees, ((x * width) - backgroundScroll * 0.9, screenHeight - pineTrees.get_height() - 150))
-		gameWindow.blit(pineTrees_2, ((x * width) - backgroundScroll * 1, screenHeight - pineTrees_2.get_height()))
+	if(startGame == False):
+		gameWindow.fill((125, 255, 255))
+		if(playButton.draw()):
+			startGame = True
+		if(exitButton.draw()):
+			gameRunning = False
 
-	# Game World Creation:
-	gameWorld.draw()
+	else:
 
-	# User Interface:
-	drawText(f'Ammo: {gamePlayer.ammo}', (0, 0, 0), 30, 20)
-	drawText(f'Grenades: {gamePlayer.grenades}', (0, 0, 0), 150, 20)
-	healthBar.draw(gamePlayer.health)
+		# Background:
+		gameWindow.fill((125, 255, 255))
+		width = sky.get_width()
+		for x in range(10):
+			gameWindow.blit(sky, ((x * width) - backgroundScroll * 0.5, 0))
+			gameWindow.blit(mountain, ((x * width) - backgroundScroll * 0.7, screenHeight - mountain.get_height() - 300))
+			gameWindow.blit(pineTrees, ((x * width) - backgroundScroll * 0.9, screenHeight - pineTrees.get_height() - 150))
+			gameWindow.blit(pineTrees_2, ((x * width) - backgroundScroll * 1, screenHeight - pineTrees_2.get_height()))
 
-	# Player:
-	gamePlayer.update()
-	gamePlayer.draw()
+		# Game World Creation:
+		gameWorld.draw()
 
-	# Enemies:
-	for enemy in enemyGroup:
-		enemy.draw()
-		enemy.handleAI()
-		enemy.update()
+		# User Interface:
+		drawText(f'Ammo: {gamePlayer.ammo}', (0, 0, 0), 30, 20)
+		drawText(f'Grenades: {gamePlayer.grenades}', (0, 0, 0), 150, 20)
+		healthBar.draw(gamePlayer.health)
 
-	# Bullets & Grenades:
-	bulletGroup.update()
-	grenadeGroup.update()
-	bulletGroup.draw(gameWindow)
-	grenadeGroup.draw(gameWindow)
+		# Player:
+		gamePlayer.update()
+		gamePlayer.draw()
 
-	# Game Explosions: 
-	explosionGroup.update()
-	explosionGroup.draw(gameWindow)
+		# Enemies:
+		for enemy in enemyGroup:
+			enemy.draw()
+			enemy.handleAI()
+			enemy.update()
 
-	# Game Pickups: 
-	gamePickups.update()
-	gamePickups.draw(gameWindow)
+		# Bullets & Grenades:
+		bulletGroup.update()
+		grenadeGroup.update()
+		bulletGroup.draw(gameWindow)
+		grenadeGroup.draw(gameWindow)
 
-	# Game Objects:
+		# Game Explosions: 
+		explosionGroup.update()
+		explosionGroup.draw(gameWindow)
 
-	gameObjects.update()
-	gameObjects.draw(gameWindow)
+		# Game Pickups: 
+		gamePickups.update()
+		gamePickups.draw(gameWindow)
 
-	# Chemicals:
+		# Game Objects:
 
-	chemicalsGroup.update()
-	chemicalsGroup.draw(gameWindow)
+		gameObjects.update()
+		gameObjects.draw(gameWindow)
 
-	# Game Exits:
+		# Chemicals:
 
-	gameExits.update()
-	gameExits.draw(gameWindow)
+		chemicalsGroup.update()
+		chemicalsGroup.draw(gameWindow)
 
-	if(gamePlayer.alive):
-		if(shoot):
-			gamePlayer.shoot()
-		elif(throwGrenade and grenadeThrown == False and gamePlayer.grenades > 0):
-			grenade = Grenade(gamePlayer.rect.centerx, gamePlayer.rect.top, gamePlayer.direction)
-			grenadeGroup.add(grenade)
-			grenadeThrown = True
-			gamePlayer.grenades -= 1
-		elif(moveLeft or moveRight):
-			gamePlayer.updateAction(1)
-		else:
-			gamePlayer.updateAction(0)
-		screenScroll = gamePlayer.move(moveLeft, moveRight)
-		backgroundScroll -= screenScroll
+		# Game Exits:
+
+		gameExits.update()
+		gameExits.draw(gameWindow)
+
+		if(gamePlayer.alive):
+			if(shoot):
+				gamePlayer.shoot()
+			elif(throwGrenade and grenadeThrown == False and gamePlayer.grenades > 0):
+				grenade = Grenade(gamePlayer.rect.centerx, gamePlayer.rect.top, gamePlayer.direction)
+				grenadeGroup.add(grenade)
+				grenadeThrown = True
+				gamePlayer.grenades -= 1
+			elif(moveLeft or moveRight):
+				gamePlayer.updateAction(1)
+			else:
+				gamePlayer.updateAction(0)
+			screenScroll = gamePlayer.move(moveLeft, moveRight)
+			backgroundScroll -= screenScroll
 
 	# Event Handler:
 	for event in pygame.event.get():
