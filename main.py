@@ -38,6 +38,7 @@ levelColumns = 150
 tileSize = screenHeight // levelRows
 gameTiles = 24
 gameLevel = 1
+maxGameLevels = 2
 
 scrollThresh = 300
 screenScroll = 0
@@ -64,7 +65,7 @@ bulletPickup = pygame.image.load('assets/Pickups/Bullet_Pickup.png').convert_alp
 pickups = {
 	'Health'	: healthPickup,
 	'Grenade'	: grenadePickup,
-	'Bullets'	: bulletPickup
+	'Ammo'	: bulletPickup
 }
 
 # Background: #
@@ -224,6 +225,10 @@ class Soldier(pygame.sprite.Sprite):
 		if(self.rect.bottom > screenHeight):
 			self.health = 0
 
+		levelComplete = False
+		if(pygame.sprite.spritecollide(gamePlayer, gameExits, False)):
+			levelComplete = True
+
 
 		if(self.type == 'Player'):
 			if(self.rect.left + deltaX < 0 or self.rect.right + deltaX > screenWidth):
@@ -237,7 +242,7 @@ class Soldier(pygame.sprite.Sprite):
 				self.rect.x -= deltaX
 				screenScroll = -deltaX
 
-		return screenScroll
+		return screenScroll, levelComplete
 
 	def handleAI(self):
 		if(self.alive and gamePlayer.alive):
@@ -440,7 +445,7 @@ class Pickup(pygame.sprite.Sprite):
 
 	def update(self):
 		if(pygame.sprite.collide_rect(self, gamePlayer)):
-			if(self.type == 'Bullets'):
+			if(self.type == 'Ammo'):
 				gamePlayer.ammo += 7
 			elif(self.type == 'Health'):
 				gamePlayer.health += 50
@@ -697,8 +702,21 @@ while(gameRunning):
 				gamePlayer.updateAction(1)
 			else:
 				gamePlayer.updateAction(0)
-			screenScroll = gamePlayer.move(moveLeft, moveRight)
+			screenScroll, levelComplete = gamePlayer.move(moveLeft, moveRight)
 			backgroundScroll -= screenScroll
+
+			if(levelComplete):
+				gameLevel += 1
+				backgroundScroll = 0
+				worldData = resetLevel()
+				if(gameLevel <= maxGameLevels):
+					with open(f'levels/level{gameLevel}_data.csv', newline='') as csvfile:
+						reader = csv.reader(csvfile, delimiter=',')
+						for x, row in enumerate(reader):
+							for y, tile in enumerate(row):
+								worldData[x][y] = int(tile)
+					gameWorld = World()
+					gamePlayer, healthBar = gameWorld.processData(worldData)
 		else:
 			screenScroll = 0
 			if(againButton.draw()):
