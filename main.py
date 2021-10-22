@@ -39,7 +39,7 @@ tileSize = screenHeight // levelRows
 gameTiles = 24
 gameLevel = 1
 
-scrollThresh = 100
+scrollThresh = 300
 screenScroll = 0
 backgroundScroll = 0
 
@@ -168,7 +168,7 @@ class Soldier(pygame.sprite.Sprite):
 			self.direction = 1
 
 		if(self.jump == True and self.inAir == False):
-			self.velocityY = -20
+			self.velocityY = -10
 			self.jump = False
 			self.inAir = True
 
@@ -267,7 +267,7 @@ class Soldier(pygame.sprite.Sprite):
 
 	def shoot(self):
 		if(self.shootTimer == 0 and self.ammo > 0):
-			self.shootTimer = 40
+			self.shootTimer = 10
 			bullet = Bullet(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery+10, self.direction)
 			bulletGroup.add(bullet)
 			self.ammo -= 1
@@ -303,7 +303,7 @@ class World():
 
 					elif(t == 19):
 						# Player:
-						gamePlayer = Soldier('Player', x * tileSize, y * tileSize, 3, 5, 7, 3)
+						gamePlayer = Soldier('Player', x * tileSize, y * tileSize, 3, 5, 32, 3)
 						# Health Bar:
 						healthBar = HBar(30, 70)
 
@@ -487,10 +487,10 @@ class Grenade(pygame.sprite.Sprite):
 			self.kill()
 			explosion = Explosion(self.rect.x, self.rect.y)
 			explosionGroup.add(explosion)
-			if abs((self.rect.centerx - gamePlayer.rect.centerx) < tileSize * 2 and (self.rect.centery - gamePlayer.rect.centery) < tileSize * 2):
+			if (abs(self.rect.centerx - gamePlayer.rect.centerx) < tileSize * 2 and (self.rect.centery - gamePlayer.rect.centery) < tileSize * 2):
 				gamePlayer.health -= 50
 			for enemy in enemyGroup:
-				if abs((self.rect.centerx - enemy.rect.centerx) < tileSize * 2 and (self.rect.centery - enemy.rect.centery) < tileSize * 2):
+				if (abs(self.rect.centerx - enemy.rect.centerx) < tileSize * 2 and (self.rect.centery - enemy.rect.centery) < tileSize * 2):
 					enemy.health -= 100
 
 class Explosion(pygame.sprite.Sprite):
