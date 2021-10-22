@@ -78,6 +78,7 @@ sky = pygame.image.load('assets/Background/Sky.png')
 
 play = pygame.image.load('assets/Buttons/Play.png')
 exit = pygame.image.load('assets/Buttons/Exit.png')
+again = pygame.image.load('assets/Buttons/Again.png')
 
 # Tiles: #
 
@@ -94,6 +95,22 @@ font = pygame.font.SysFont('System', 30)
 def drawText(text, color, x, y):
 	image = font.render(text, True, color)
 	gameWindow.blit(image, (x, y))
+
+# Resetting the level:
+
+def resetLevel():
+	enemyGroup.empty()
+	bulletGroup.empty()
+	grenadeGroup.empty()
+	gamePickups.empty()
+	gameObjects.empty()
+	chemicalsGroup.empty()
+	gameExits.empty()
+	data = []
+	for r in range(levelRows):
+		row = [-1] * levelColumns
+		data.append(row)
+	return data
 
 # Player Class: #
 
@@ -179,7 +196,7 @@ class Soldier(pygame.sprite.Sprite):
 
 		self.velocityY += gameGravity
 		if(self.velocityY > 10):
-			self.velocityY = 50
+			self.velocityY = 20
 			self.inAir = False
 		deltaY += self.velocityY
 
@@ -200,6 +217,13 @@ class Soldier(pygame.sprite.Sprite):
 					self.velocityY = 0
 					self.inAir = False
 					deltaY = tile[1].top - self.rect.bottom
+
+		if(pygame.sprite.spritecollide(gamePlayer, chemicalsGroup, False)):
+			self.health = 0
+
+		if(self.rect.bottom > screenHeight):
+			self.health = 0
+
 
 		if(self.type == 'Player'):
 			if(self.rect.left + deltaX < 0 or self.rect.right + deltaX > screenWidth):
@@ -556,6 +580,7 @@ class Explosion(pygame.sprite.Sprite):
 # Buttons:
 playButton = Button(screenWidth // 2 - 130, screenHeight // 2 - 300, play, 8)
 exitButton = Button(screenWidth // 2 - 130, screenHeight // 2 - 100, exit, 8)
+againButton = Button(screenWidth // 2 - 130, screenHeight // 2 - 100, again, 8)
 
 # Groups: 
 bulletGroup = pygame.sprite.Group()
@@ -593,6 +618,10 @@ while(gameRunning):
 
 	if(startGame == False):
 		gameWindow.fill((125, 255, 255))
+		gameWindow.blit(sky, (0, 0))
+		gameWindow.blit(mountain, (0, 280))
+		gameWindow.blit(pineTrees, (0, 400))
+		gameWindow.blit(pineTrees_2, (0, 500))
 		if(playButton.draw()):
 			startGame = True
 		if(exitButton.draw()):
@@ -670,6 +699,20 @@ while(gameRunning):
 				gamePlayer.updateAction(0)
 			screenScroll = gamePlayer.move(moveLeft, moveRight)
 			backgroundScroll -= screenScroll
+		else:
+			screenScroll = 0
+			if(againButton.draw()):
+				backgroundScroll = 0
+				worldData = resetLevel()
+				with open(f'levels/level{gameLevel}_data.csv', newline='') as csvfile:
+					reader = csv.reader(csvfile, delimiter=',')
+					for x, row in enumerate(reader):
+						for y, tile in enumerate(row):
+							worldData[x][y] = int(tile)
+				gameWorld = World()
+				gamePlayer, healthBar = gameWorld.processData(worldData)
+
+
 
 	# Event Handler:
 	for event in pygame.event.get():
