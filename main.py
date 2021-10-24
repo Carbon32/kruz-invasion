@@ -40,7 +40,6 @@ levelColumns = 150
 tileSize = screenHeight // levelRows
 gameTiles = 24
 gameLevel = 1
-maxGameLevels = 2
 
 scrollThresh = 300
 screenScroll = 0
@@ -766,7 +765,8 @@ while(gameRunning):
 				gameLevel += 1
 				backgroundScroll = 0
 				worldData = resetLevel()
-				if(gameLevel <= maxGameLevels):
+				if(gameLevel == 3):
+					gameLevel = 1
 					with open(f'levels/level{gameLevel}_data.csv', newline='') as csvfile:
 						reader = csv.reader(csvfile, delimiter=',')
 						for x, row in enumerate(reader):
@@ -774,6 +774,15 @@ while(gameRunning):
 								worldData[x][y] = int(tile)
 					gameWorld = World()
 					gamePlayer, healthBar = gameWorld.processData(worldData)
+				else:
+					with open(f'levels/level{gameLevel}_data.csv', newline='') as csvfile:
+						reader = csv.reader(csvfile, delimiter=',')
+						for x, row in enumerate(reader):
+							for y, tile in enumerate(row):
+								worldData[x][y] = int(tile)
+					gameWorld = World()
+					gamePlayer, healthBar = gameWorld.processData(worldData)
+
 		else:
 			screenScroll = 0
 			if(deathFade.fade()):
