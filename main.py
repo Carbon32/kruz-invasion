@@ -47,6 +47,7 @@ screenScroll = 0
 backgroundScroll = 0
 
 startGame = False
+startIntro = False
 
 # Game Window: #
 
@@ -600,7 +601,36 @@ class Explosion(pygame.sprite.Sprite):
 				self.image = self.explosions[self.index]
 		self.rect.x += screenScroll
 
+# Fade In:
+
+class Fade():
+	def __init__(self, direction, color, speed):
+		self.direction = direction
+		self.color = color
+		self.speed = speed
+		self.fadeCounter = 0
+
+	def fade(self):
+		fadeCompleted = False
+		self.fadeCounter += self.speed
+		if(self.direction == 1):
+			pygame.draw.rect(gameWindow, self.color, (0 - self.fadeCounter, 0, screenWidth // 2, screenHeight))
+			pygame.draw.rect(gameWindow, self.color, (screenWidth // 2 + self.fadeCounter, 0, screenWidth, screenHeight))
+			pygame.draw.rect(gameWindow, self.color, (0, 0 - self.fadeCounter, screenWidth, screenHeight // 2))
+			pygame.draw.rect(gameWindow, self.color, (0, screenHeight // 2 + self.fadeCounter, screenWidth, screenHeight))
+		if(self.direction == 2):
+			pygame.draw.rect(gameWindow, self.color, (0, 0, screenWidth, 0 + self.fadeCounter))
+		
+		if(self.fadeCounter >= screenWidth):
+			fadeCompleted = True
+		return fadeCompleted
+
 # Game Creations: #
+
+# Screen Fade In:
+
+deathFade = Fade(2, ((0, 0, 0)), 5)
+startFade = Fade(1, ((0, 0, 0)), 5)
 
 # Buttons:
 playButton = Button(screenWidth // 2 - 130, screenHeight // 2 - 300, play, 8)
@@ -649,6 +679,7 @@ while(gameRunning):
 		gameWindow.blit(pineTrees_2, (0, 500))
 		if(playButton.draw()):
 			startGame = True
+			startIntro = True
 		if(exitButton.draw()):
 			gameRunning = False
 
@@ -710,6 +741,11 @@ while(gameRunning):
 		gameExits.update()
 		gameExits.draw(gameWindow)
 
+		if(startIntro == True):
+			if(startFade.fade()):
+				startIntro = False
+				startFade.fadeCounter = 0
+
 		if(gamePlayer.alive):
 			if(shoot):
 				gamePlayer.shoot()
@@ -726,6 +762,7 @@ while(gameRunning):
 			backgroundScroll -= screenScroll
 
 			if(levelComplete):
+				startIntro = True
 				gameLevel += 1
 				backgroundScroll = 0
 				worldData = resetLevel()
@@ -739,16 +776,19 @@ while(gameRunning):
 					gamePlayer, healthBar = gameWorld.processData(worldData)
 		else:
 			screenScroll = 0
-			if(againButton.draw()):
-				backgroundScroll = 0
-				worldData = resetLevel()
-				with open(f'levels/level{gameLevel}_data.csv', newline='') as csvfile:
-					reader = csv.reader(csvfile, delimiter=',')
-					for x, row in enumerate(reader):
-						for y, tile in enumerate(row):
-							worldData[x][y] = int(tile)
-				gameWorld = World()
-				gamePlayer, healthBar = gameWorld.processData(worldData)
+			if(deathFade.fade()):
+				if(againButton.draw()):
+					startFade.fadeCounter = 0
+					startIntro = True 
+					backgroundScroll = 0
+					worldData = resetLevel()
+					with open(f'levels/level{gameLevel}_data.csv', newline='') as csvfile:
+						reader = csv.reader(csvfile, delimiter=',')
+						for x, row in enumerate(reader):
+							for y, tile in enumerate(row):
+								worldData[x][y] = int(tile)
+					gameWorld = World()
+					gamePlayer, healthBar = gameWorld.processData(worldData)
 
 
 
