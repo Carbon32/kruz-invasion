@@ -9,6 +9,7 @@
 # Imports: #
 
 import pygame
+from pygame import mixer
 import random
 import os
 import csv
@@ -16,6 +17,7 @@ import csv
 # Pygame Initialization: #
 
 pygame.init()
+mixer.init()
 
 # Game Variables: #
 
@@ -54,7 +56,23 @@ pygame.display.set_caption("Kruz Invasion:")
 # Frame Limiter: #
 
 handleFPS = pygame.time.Clock()
-FPS = 120
+FPS = 60
+
+# Music & Sound Effects:
+
+# Music:
+pygame.mixer.music.load('sound/Weird_Background_Music.mp3')
+pygame.mixer.music.set_volume(0.4)
+pygame.mixer.music.play(-1, 0.0, 5000)
+
+# Sounds:
+gunshot = pygame.mixer.Sound('sound/Gunshot.mp3')
+gunshot.set_volume(0.2)
+jumpSound = pygame.mixer.Sound('sound/Jumping.mp3')
+jumpSound.set_volume(0.02)
+explosionSound = pygame.mixer.Sound('sound/Explosion.mp3')
+explosionSound.set_volume(0.5)
+
 
 # Pickups: #
 
@@ -305,6 +323,7 @@ class Soldier(pygame.sprite.Sprite):
 			bullet = Bullet(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery+10, self.direction)
 			bulletGroup.add(bullet)
 			self.ammo -= 1
+			gunshot.play()
 
 	def draw(self):
 		gameWindow.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
@@ -450,7 +469,7 @@ class Pickup(pygame.sprite.Sprite):
 			elif(self.type == 'Health'):
 				gamePlayer.health += 50
 				if(gamePlayer.health > gamePlayer.maxHealth):
-					gamePlayer.health = maxHealth
+					gamePlayer.health = gamePlayer.maxHealth
 			elif(self.type == 'Grenade'):
 				gamePlayer.grenades += 3
 			self.kill()
@@ -544,6 +563,7 @@ class Grenade(pygame.sprite.Sprite):
 		self.timer -= 1
 		if(self.timer <= 0):
 			self.kill()
+			explosionSound.play()
 			explosion = Explosion(self.rect.x, self.rect.y)
 			explosionGroup.add(explosion)
 			if (abs(self.rect.centerx - gamePlayer.rect.centerx) < tileSize * 2 and (self.rect.centery - gamePlayer.rect.centery) < tileSize * 2):
@@ -743,8 +763,9 @@ while(gameRunning):
 				moveRight = True
 			if(event.key == pygame.K_q):
 				moveLeft = True
-			if(event.key == pygame.K_SPACE and gamePlayer.alive):
+			if(event.key == pygame.K_SPACE and gamePlayer.alive and gamePlayer.inAir == False):
 				gamePlayer.jump = True
+				jumpSound.play()
 			if(event.key == pygame.K_ESCAPE):
 				gameRunning = False
 			if(event.key == pygame.K_e):
