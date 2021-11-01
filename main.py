@@ -1,6 +1,6 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                             #
-#                 Kruz Invasion, shooter video game                           #
+#                 Land Invasion, shooter video game                           #
 #                                   based in World War II                     #
 #                                             Developer: Carbon               #
 #                                                                             #
@@ -51,7 +51,7 @@ startIntro = False
 # Game Window: #
 
 gameWindow = pygame.display.set_mode((screenWidth, screenHeight))
-pygame.display.set_caption("Kruz Invasion:")
+pygame.display.set_caption("Land Invasion:")
 
 # Frame Limiter: #
 

@@ -1,6 +1,6 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                             #
-#                   Kruz Invasion, Level Editor                               #
+#                   Land Invasion, Level Editor                               #
 #                                         Developer: Carbon                   #
 #                                                                             #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -25,7 +25,7 @@ lowerMargin = 100
 sideMargin = 300
 
 editorWindow = pygame.display.set_mode((screenWidth + sideMargin, screenHeight + lowerMargin))
-pygame.display.set_caption('Kruz Invasion: Level Editor')
+pygame.display.set_caption('Land Invasion: Level Editor')
 
 # Editor Variables: #
 
