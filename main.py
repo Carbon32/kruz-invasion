@@ -24,11 +24,17 @@ window.init()
 world = World()
 world.processData(worldData)
 
+# Player: #
+gamePlayer = Soldier('Player', 100, 100, 3, 4, 0, 0)
+
 # Game Loop: #
 
 while(window.engineRunning):
 	window.limitFPS(60)
 	window.setBackground(sky, mountain, trees, 0, 0)
 	world.draw(window.engineWindow)
+	gamePlayer.update()
+	gamePlayer.move(world)
+	gamePlayer.draw(window.engineWindow)
 	window.updateDisplay()
 window.quit()
