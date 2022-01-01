@@ -11,9 +11,13 @@ from engine import *
 
 # Game Assets: #
 
-mountain = pygame.image.load('assets/Background/Mountain.png')
-trees = pygame.image.load('assets/Background/Pines.png')
-sky = pygame.image.load('assets/Background/Sky.png')
+mountain = loadStaticImage('assets/Background/Mountain.png')
+trees = loadStaticImage('assets/Background/Pines.png')
+sky = loadStaticImage('assets/Background/Sky.png')
+healthPickup = loadGameImage('assets/Pickups/Health_Pickup.png', 32, 32)
+grenadePickup = loadGameImage('assets/Pickups/Grenade_Pickup.png', 32, 32)
+bulletPickup = loadGameImage('assets/Pickups/Bullet_Pickup.png', 32, 32)
+loadGamePickups(healthPickup, grenadePickup, bulletPickup)
 
 # Game Window: #
 
@@ -22,7 +26,6 @@ window.init()
 
 # World: #
 world = World()
-gamePlayer = Soldier("Player", 100, 0, 2, 4, 0, 0)
 world.processData(worldData)
 
 # Game Loop: #
@@ -30,7 +33,7 @@ world.processData(worldData)
 while(window.engineRunning):
 	window.limitFPS(60)
 	window.setBackground(sky, mountain, trees, 0, 0)
-	updateGameMechanics(world)
+	updateGameMechanics(window.engineWindow, world)
 	drawGameSprites(window.engineWindow, world)
 	window.updateDisplay()
 window.quit()

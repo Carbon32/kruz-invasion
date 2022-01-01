@@ -31,7 +31,7 @@ engineGravity = 0.5
 level = 1
 levelRows = 16
 levelColumns = 150
-tileSize = 50
+tileSize = 48
 engineTiles = 24
 levelComplete = False
 
@@ -56,6 +56,8 @@ for c in range(engineTiles):
 	image = pygame.transform.scale(image, (tileSize, tileSize))
 	allTiles.append(image)
 
+pickups = {}
+
 # Levels: #
 
 worldData = []
@@ -71,22 +73,42 @@ with open(f'levels/level{level}_data.csv', newline='') as csvfile:
 
 # Game Functions: #
 
-def updateGameMechanics(world : list):
-	global backgroundScroll, screenScroll
+def loadGamePickups(healthPickup : pygame.Surface, grenadePickup : pygame.Surface, bulletPickup : pygame.Surface):
+	global pickups
+	pickups = {
+		'Health'	: healthPickup,
+		'Grenade'	: grenadePickup,
+		'Ammo'	: bulletPickup
+	}
+
+def loadGameImage(path : str, width : int, height : int):
+		image = pygame.image.load(path)
+		image = pygame.transform.scale(image, (width, height))
+		return image
+
+def loadStaticImage(path : str):
+		image = pygame.image.load(path)
+		return image
+
+def updateGameMechanics(engineWindow : pygame.Surface, world : list):
 	playersGroup.update(world)
+	for enemy in enemyGroup:
+		enemy.handleAI(world)
 	bulletGroup.update(world)
 	grenadeGroup.update(world)
 	explosionGroup.update()
-	gamePickups.update()
+	gamePickups.update(engineWindow)
 	gameObjects.update()
 	chemicalsGroup.update()
 	gameExits.update()
-	backgroundScroll -= screenScroll
 
 def drawGameSprites(engineWindow : pygame.Surface, world : list):
 	world.draw(engineWindow)
 	for player in playersGroup:
 		player.draw(engineWindow)
+
+	for enemy in enemyGroup:
+		enemy.draw(engineWindow)
 
 	for bullet in bulletGroup:
 		bullet.draw(engineWindow)
@@ -180,7 +202,7 @@ class World():
 
 					elif(t == 19):
 						# Player:
-						gamePlayer = Soldier('Player', x * tileSize, y * tileSize, 3, 5, 32, 3)
+						gamePlayer = Soldier('Player', x * tileSize, y * tileSize, 2, 4, 32, 3)
 						playersGroup.add(gamePlayer)
 
 						# Health Bar:
@@ -189,7 +211,7 @@ class World():
 
 					elif(t == 20):
 						# Enemy:
-						gameEnemy = Soldier('Enemy', x * tileSize, y * tileSize, 3, 1, 24, 0)
+						gameEnemy = Soldier('Enemy', x * tileSize, y * tileSize + 15, 2, 1, 24, 0)
 						enemyGroup.add(gameEnemy)
 
 					# Pickups:
@@ -211,6 +233,7 @@ class World():
 						gameExits.add(exit)
 
 	def draw(self, engineWindow : pygame.Surface):
+		global screenScroll
 		for tile in self.obstacleList:
 			tile[1][0] += screenScroll
 			engineWindow.blit(tile[0], tile[1])
@@ -293,7 +316,7 @@ class Soldier(pygame.sprite.Sprite):
 
 
 	def move(self, world : list):
-		global shoot, throwGrenade, grenadeThrown
+		global shoot, throwGrenade, grenadeThrown, screenScroll
 		if(self.type == 'Player'):
 			if(pygame.key.get_pressed()[pygame.K_d]):
 				self.moveRight = True
@@ -388,7 +411,12 @@ class Soldier(pygame.sprite.Sprite):
 
 		return screenScroll, levelComplete
 
-	def handleAI(self):
+	def handleAI(self, world : list):
+			move = 0
+			self.updateAnimation()
+			self.isAlive()
+			if(self.shootTimer > 0):
+				self.shootTimer -= 1
 			for player in playersGroup:
 				if(self.alive and player.alive):
 					if(self.idle == False and random.randint(1, 512) == 6):
@@ -401,11 +429,12 @@ class Soldier(pygame.sprite.Sprite):
 					else:
 						if(self.idle == False):
 							if(self.direction == 1):
-								aiRight = True
+								move = 1
+								self.flip = False
 							else:
-								aiRight = False
-							aiLeft = not aiRight
-							self.move(aiLeft, aiRight)
+								self.flip = True
+								move = -1
+							self.rect.x += move
 							self.updateAction(1)
 							self.moveCounter += 1
 							self.enemyVision.center = (self.rect.centerx + 100 * self.direction, self.rect.centery)
@@ -467,6 +496,7 @@ class Object(pygame.sprite.Sprite):
 		engineWindow.blit(self.image, self.rect)
 
 	def update(self):
+		global screenScroll
 		self.rect.x += screenScroll
 
 # Pickup Class: #
@@ -483,8 +513,8 @@ class Pickup(pygame.sprite.Sprite):
 		engineWindow.blit(self.image, self.rect)
 
 	def update(self, engineWindow : pygame.Surface):
-		if(pygame.sprite.collide_rect(self, playersGroup)):
-			for player in playersGroup:
+		for player in playersGroup:
+			if(pygame.sprite.collide_rect(self, player)):
 				if(self.type == 'Ammo'):
 					player.ammo += 7
 				elif(self.type == 'Health'):
@@ -494,6 +524,7 @@ class Pickup(pygame.sprite.Sprite):
 				elif(self.type == 'Grenade'):
 					player.grenades += 3
 				self.kill()
+		global screenScroll
 		self.rect.x += screenScroll
 
 # Health Bar: #
@@ -632,4 +663,5 @@ class Explosion(pygame.sprite.Sprite):
 				self.kill()
 			else:
 				self.image = self.explosions[self.index]
+		global screenScroll
 		self.rect.x += screenScroll
