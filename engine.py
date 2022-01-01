@@ -20,9 +20,6 @@ mixer.init()
 
 # Engine Variables: #
 
-windowWidth = 0
-windowHeight = 0
-
 scrollThresh = 300
 screenScroll = 0
 backgroundScroll = 0
@@ -34,6 +31,13 @@ levelColumns = 150
 tileSize = 48
 engineTiles = 22
 levelComplete = False
+
+gunshot = mixer.Sound
+explosion = mixer.Sound
+jump = mixer.Sound
+healthPick = mixer.Sound
+grenadePick = mixer.Sound
+ammoPick = mixer.Sound
 
 # Groups: #
 
@@ -72,6 +76,29 @@ with open(f'levels/level{level}_data.csv', newline='') as csvfile:
 
 # Game Functions: #
 
+def updateGameLevel(complete : bool, world : list):
+	global level
+	if(complete):
+		level += 1
+		backgroundScroll = 0
+		worldData = resetLevel()
+		with open(f'levels/level{level}_data.csv', newline='') as csvfile:
+			reader = csv.reader(csvfile, delimiter=',')
+			for x, row in enumerate(reader):
+				for y, tile in enumerate(row):
+					worldData[x][y] = int(tile)
+		world.obstacleList = []
+		world.processData(worldData)
+
+def assignGameSounds(gunshot_sound : mixer.Sound, explosion_sound : mixer.Sound, jump_sound : mixer.Sound, health_pick : mixer.Sound, grenade_pick : mixer.Sound, ammo_pick : mixer.Sound):
+	global gunshot, jump, explosion, healthPick, grenadePick, ammoPick
+	gunshot = gunshot_sound
+	explosion = explosion_sound
+	jump = jump_sound
+	healthPick = health_pick
+	grenadePick = grenade_pick
+	ammoPick = ammo_pick
+
 def drawText(engineWindow : pygame.Surface, text : str, color : tuple, x : int, y : int):
 	image = pygame.font.SysFont('System', 30).render(text, True, color)
 	engineWindow.blit(image, (x, y))
@@ -82,6 +109,7 @@ def drawStats(engineWindow : pygame.Surface):
 		drawText(engineWindow, f'Grenades: {player.grenades}', (48, 45, 45), 150, 20)
 
 def resetLevel():
+	playersGroup.empty()
 	enemyGroup.empty()
 	bulletGroup.empty()
 	grenadeGroup.empty()
@@ -111,7 +139,8 @@ def loadStaticImage(path : str):
 		image = pygame.image.load(path)
 		return image
 
-def updateGameMechanics(engineWindow : pygame.Surface, world : list):
+def updateGameMechanics(engineWindow : pygame.Surface, world : list, gunshot_sound : mixer.Sound, explosion_sound : mixer.Sound, jump_sound : mixer.Sound, health_pick : mixer.Sound, grenade_pick : mixer.Sound, ammo_pick : mixer.Sound):
+		global levelComplete
 		playersGroup.update(world)
 		for enemy in enemyGroup:
 			enemy.handleAI(world)
@@ -120,6 +149,9 @@ def updateGameMechanics(engineWindow : pygame.Surface, world : list):
 		explosionGroup.update()
 		pickupsGroup.update(engineWindow)
 		chemicalsGroup.update()
+		exitsGroup.update()
+		updateGameLevel(levelComplete, world)
+		assignGameSounds(gunshot_sound, explosion_sound, jump_sound, health_pick, grenade_pick, ammo_pick)
 
 def drawGameSprites(engineWindow : pygame.Surface, world : list):
 		world.draw(engineWindow)
@@ -151,6 +183,16 @@ def drawGameSprites(engineWindow : pygame.Surface, world : list):
 			health.draw(engineWindow)
 
 		drawStats(engineWindow)
+
+def playMusic(path : str, volume : int):
+	pygame.mixer.music.load(path)
+	pygame.mixer.music.set_volume(volume)
+	pygame.mixer.music.play(-1, 0.0, 5000)
+
+def loadGameSound(path : str, volume : float):
+	sound = pygame.mixer.Sound(path)
+	sound.set_volume(volume)
+	return sound
 
 # Engine Window: #
 
@@ -333,7 +375,7 @@ class Soldier(pygame.sprite.Sprite):
 
 
 	def move(self, world : list):
-		global shoot, throwGrenade, grenadeThrown, screenScroll
+		global shoot, throwGrenade, grenadeThrown, screenScroll, levelComplete
 		if(self.type == 'Player'):
 			if(pygame.key.get_pressed()[pygame.K_d]):
 				self.moveRight = True
@@ -378,6 +420,7 @@ class Soldier(pygame.sprite.Sprite):
 			self.velocityY = -10
 			self.jump = False
 			self.inAir = True
+			jump.play()
 
 		self.velocityY += engineGravity
 		if(self.velocityY > 20):
@@ -496,6 +539,7 @@ class Soldier(pygame.sprite.Sprite):
 			bullet = Bullet(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery+10, self.direction)
 			bulletGroup.add(bullet)
 			self.ammo -= 1
+			gunshot.play()
 
 	def draw(self, engineWindow : pygame.Surface):
 		engineWindow.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
@@ -534,12 +578,15 @@ class Pickup(pygame.sprite.Sprite):
 			if(pygame.sprite.collide_rect(self, player)):
 				if(self.type == 'Ammo'):
 					player.ammo += 7
+					ammoPick.play()
 				elif(self.type == 'Health'):
 					player.health += 50
 					if(player.health > player.maxHealth):
 						player.health = player.maxHealth
+					healthPick.play()
 				elif(self.type == 'Grenade'):
 					player.grenades += 3
+					grenadePick.play()
 				self.kill()
 		global screenScroll
 		self.rect.x += screenScroll
@@ -562,7 +609,7 @@ class HBar():
 		pygame.draw.rect(engineWindow, (0, 250, 0), (self.x, self.y, 150 * (self.health / self.maxHealth), 20))
 
 
-# Bullet Class: #
+# Bullets: #
 
 class Bullet(pygame.sprite.Sprite):
 	def __init__(self, x : int, y : int, direction : int):
@@ -596,6 +643,8 @@ class Bullet(pygame.sprite.Sprite):
 					enemy.health -= 25
 					self.kill()
 
+
+# Grenades: #
 
 class Grenade(pygame.sprite.Sprite):
 	def __init__(self, x : int, y : int, direction : int):
@@ -642,14 +691,17 @@ class Grenade(pygame.sprite.Sprite):
 		self.timer -= 1
 		if(self.timer <= 0):
 			self.kill()
-			explosion = Explosion(self.rect.x, self.rect.y)
-			explosionGroup.add(explosion)
+			explosionEffect = Explosion(self.rect.x, self.rect.y)
+			explosionGroup.add(explosionEffect)
 			for player in playersGroup:
 				if (abs(self.rect.centerx - player.rect.centerx) < tileSize * 2 and (self.rect.centery - player.rect.centery) < tileSize * 2):
 					player.health -= 50
 			for enemy in enemyGroup:
 				if (abs(self.rect.centerx - enemy.rect.centerx) < tileSize * 2 and (self.rect.centery - enemy.rect.centery) < tileSize * 2):
 					enemy.health -= 100
+			explosion.play()
+
+# Explosions: 
 
 class Explosion(pygame.sprite.Sprite):
 	def __init__(self, x : int, y : int):
@@ -683,6 +735,8 @@ class Explosion(pygame.sprite.Sprite):
 		global screenScroll
 		self.rect.x += screenScroll
 
+# Buttons: #
+
 class Button():
 	def __init__(self, x : int, y : int, image : pygame.Surface):
 		self.image = image
@@ -703,3 +757,27 @@ class Button():
 
 		engineWindow.blit(self.image, (self.rect.x, self.rect.y))
 		return action
+
+# Fade In:
+
+class Fade():
+	def __init__(self, direction : int, color : tuple, speed : int):
+		self.direction = direction
+		self.color = color
+		self.speed = speed
+		self.fadeCounter = 0
+
+	def fade(self, engineWindow : pygame.Surface, screenWidth : int, screenHeight : int):
+		fadeCompleted = False
+		self.fadeCounter += self.speed
+		if(self.direction == 1):
+			pygame.draw.rect(engineWindow, self.color, (0 - self.fadeCounter, 0, screenWidth // 2, screenHeight))
+			pygame.draw.rect(engineWindow, self.color, (screenWidth // 2 + self.fadeCounter, 0, screenWidth, screenHeight))
+			pygame.draw.rect(engineWindow, self.color, (0, 0 - self.fadeCounter, screenWidth, screenHeight // 2))
+			pygame.draw.rect(engineWindow, self.color, (0, screenHeight // 2 + self.fadeCounter, screenWidth, screenHeight))
+		if(self.direction == 2):
+			pygame.draw.rect(engineWindow, self.color, (0, 0, screenWidth, 0 + self.fadeCounter))
+		
+		if(self.fadeCounter >= screenWidth):
+			fadeCompleted = True
+		return fadeCompleted
