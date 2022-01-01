@@ -32,7 +32,7 @@ level = 1
 levelRows = 16
 levelColumns = 150
 tileSize = 48
-engineTiles = 24
+engineTiles = 22
 levelComplete = False
 
 # Groups: #
@@ -44,9 +44,8 @@ grenadeGroup = pygame.sprite.Group()
 explosionGroup = pygame.sprite.Group()
 enemyGroup = pygame.sprite.Group()
 chemicalsGroup = pygame.sprite.Group()
-gamePickups = pygame.sprite.Group()
-gameObjects = pygame.sprite.Group()
-gameExits = pygame.sprite.Group()
+pickupsGroup = pygame.sprite.Group()
+exitsGroup = pygame.sprite.Group()
 
 # Tiles: #
 
@@ -73,6 +72,28 @@ with open(f'levels/level{level}_data.csv', newline='') as csvfile:
 
 # Game Functions: #
 
+def drawText(engineWindow : pygame.Surface, text : str, color : tuple, x : int, y : int):
+	image = pygame.font.SysFont('System', 30).render(text, True, color)
+	engineWindow.blit(image, (x, y))
+
+def drawStats(engineWindow : pygame.Surface):
+	for player in playersGroup:
+		drawText(engineWindow, f'Ammo: {player.ammo}', (48, 45, 45), 30, 20)
+		drawText(engineWindow, f'Grenades: {player.grenades}', (48, 45, 45), 150, 20)
+
+def resetLevel():
+	enemyGroup.empty()
+	bulletGroup.empty()
+	grenadeGroup.empty()
+	pickupsGroup.empty()
+	chemicalsGroup.empty()
+	exitsGroup.empty()
+	data = []
+	for r in range(levelRows):
+		row = [-1] * levelColumns
+		data.append(row)
+	return data
+
 def loadGamePickups(healthPickup : pygame.Surface, grenadePickup : pygame.Surface, bulletPickup : pygame.Surface):
 	global pickups
 	pickups = {
@@ -91,48 +112,45 @@ def loadStaticImage(path : str):
 		return image
 
 def updateGameMechanics(engineWindow : pygame.Surface, world : list):
-	playersGroup.update(world)
-	for enemy in enemyGroup:
-		enemy.handleAI(world)
-	bulletGroup.update(world)
-	grenadeGroup.update(world)
-	explosionGroup.update()
-	gamePickups.update(engineWindow)
-	gameObjects.update()
-	chemicalsGroup.update()
-	gameExits.update()
+		playersGroup.update(world)
+		for enemy in enemyGroup:
+			enemy.handleAI(world)
+		bulletGroup.update(world)
+		grenadeGroup.update(world)
+		explosionGroup.update()
+		pickupsGroup.update(engineWindow)
+		chemicalsGroup.update()
 
 def drawGameSprites(engineWindow : pygame.Surface, world : list):
-	world.draw(engineWindow)
-	for player in playersGroup:
-		player.draw(engineWindow)
+		world.draw(engineWindow)
+		for player in playersGroup:
+			player.draw(engineWindow)
 
-	for enemy in enemyGroup:
-		enemy.draw(engineWindow)
+		for enemy in enemyGroup:
+			enemy.draw(engineWindow)
 
-	for bullet in bulletGroup:
-		bullet.draw(engineWindow)
+		for bullet in bulletGroup:
+			bullet.draw(engineWindow)
 
-	for grenade in grenadeGroup:
-		grenade.draw(engineWindow)
+		for grenade in grenadeGroup:
+			grenade.draw(engineWindow)
 
-	for explosion in explosionGroup:
-		explosion.draw(engineWindow)
-	
-	for pickup in gamePickups:
-		pickup.draw(engineWindow)
-	
-	for object in gameObjects:
-		object.draw(engineWindow)
+		for explosion in explosionGroup:
+			explosion.draw(engineWindow)
+		
+		for pickup in pickupsGroup:
+			pickup.draw(engineWindow)
 
-	for chemical in chemicalsGroup:
-		chemical.draw(engineWindow)
-	
-	for exit in gameExits:
-		exit.draw(engineWindow)
+		for chemical in chemicalsGroup:
+			chemical.draw(engineWindow)
+		
+		for exit in exitsGroup:
+			exit.draw(engineWindow)
 
-	for health in healthBarGroup:
-		health.draw(engineWindow)
+		for health in healthBarGroup:
+			health.draw(engineWindow)
+
+		drawStats(engineWindow)
 
 # Engine Window: #
 
@@ -190,17 +208,18 @@ class World():
 					tileRect.x = x * tileSize
 					tileRect.y = y * tileSize
 					tileData = (tile, tileRect)
-					if(t >= 0 and t <= 8):
+					if(t >= 0 and t <= 14):
 						self.obstacleList.append(tileData)
-					elif(t == 10):
+					elif(t == 15):
 						chemicals = Object(tile, x * tileSize, y * tileSize)
 						chemicalsGroup.add(chemicals)
 
-					elif(t == 9 or t == 11):
-						object = Object(tile, x * tileSize, y * tileSize)
-						gameObjects.add(object)
+					# Exit: 
+					elif(t == 16):
+						exit = Object(tile, x * tileSize, y * tileSize)
+						exitsGroup.add(exit)
 
-					elif(t == 19):
+					elif(t == 17):
 						# Player:
 						gamePlayer = Soldier('Player', x * tileSize, y * tileSize, 2, 4, 32, 3)
 						playersGroup.add(gamePlayer)
@@ -209,28 +228,23 @@ class World():
 						healthBar = HBar(gamePlayer, 30, 70)
 						healthBarGroup.append(healthBar)
 
-					elif(t == 20):
+					elif(t == 18):
 						# Enemy:
 						gameEnemy = Soldier('Enemy', x * tileSize, y * tileSize + 15, 2, 1, 24, 0)
 						enemyGroup.add(gameEnemy)
 
 					# Pickups:
-					elif(t == 21):
+					elif(t == 19):
 						ammoPickup = Pickup('Ammo', x * tileSize, y * tileSize)
-						gamePickups.add(ammoPickup)
+						pickupsGroup.add(ammoPickup)
 
-					elif(t == 22):
+					elif(t == 20):
 						grenadePickup = Pickup('Grenade', x * tileSize, y * tileSize)
-						gamePickups.add(grenadePickup)
+						pickupsGroup.add(grenadePickup)
 
-					elif(t == 23):
+					elif(t == 21):
 						healthPickup = Pickup('Health', x * tileSize, y * tileSize)
-						gamePickups.add(healthPickup)
-
-					# Exit: 
-					elif(t == 17):
-						exit = Object(tile, x * tileSize, y * tileSize)
-						gameExits.add(exit)
+						pickupsGroup.add(healthPickup)
 
 	def draw(self, engineWindow : pygame.Surface):
 		global screenScroll
@@ -301,18 +315,21 @@ class Soldier(pygame.sprite.Sprite):
 		global shoot, throwGrenade, grenadeThrown, backgroundScroll, screenScroll, levelComplete
 		self.updateAnimation()
 		self.isAlive()
-		screenScroll, levelComplete = self.move(world)
-		backgroundScroll -= screenScroll
-		if(self.shootTimer > 0):
-			self.shootTimer -= 1
-		if(shoot == True):
-			self.shoot()
-		if(throwGrenade == True):
-			if(throwGrenade and grenadeThrown == False and self.grenades > 0):
-				grenade = Grenade(self.rect.centerx, self.rect.top, self.direction)
-				grenadeGroup.add(grenade)
-				grenadeThrown = True
-				self.grenades -= 1
+		if(self.alive):
+			screenScroll, levelComplete = self.move(world)
+			backgroundScroll -= screenScroll
+			if(self.shootTimer > 0):
+				self.shootTimer -= 1
+			if(shoot == True):
+				self.shoot()
+			if(throwGrenade == True):
+				if(throwGrenade and grenadeThrown == False and self.grenades > 0):
+					grenade = Grenade(self.rect.centerx, self.rect.top, self.direction)
+					grenadeGroup.add(grenade)
+					grenadeThrown = True
+					self.grenades -= 1
+		else:
+			screenScroll = 0
 
 
 	def move(self, world : list):
@@ -363,7 +380,7 @@ class Soldier(pygame.sprite.Sprite):
 			self.inAir = True
 
 		self.velocityY += engineGravity
-		if(self.velocityY > 10):
+		if(self.velocityY > 20):
 			self.velocityY = 10
 			self.inAir = False
 		deltaY += self.velocityY
@@ -385,7 +402,7 @@ class Soldier(pygame.sprite.Sprite):
 					self.velocityY = 0
 					self.inAir = False
 					deltaY = tile[1].top - self.rect.bottom
-
+			
 		if(pygame.sprite.spritecollide(self, chemicalsGroup, False)):
 			self.health = 0
 
@@ -393,7 +410,7 @@ class Soldier(pygame.sprite.Sprite):
 			self.health = 0
 
 		levelComplete = False
-		if(pygame.sprite.spritecollide(self, gameExits, False)):
+		if(pygame.sprite.spritecollide(self, exitsGroup, False)):
 			levelComplete = True
 
 
@@ -559,7 +576,7 @@ class Bullet(pygame.sprite.Sprite):
 	def draw(self, engineWindow : pygame.Surface):
 		engineWindow.blit(self.image, self.rect)
 
-	def update(self, world):
+	def update(self, world : list):
 		self.rect.x += (self.direction * self.speed) + screenScroll
 		if(self.rect.right < 0 or self.rect.left > windowWidth):
 			self.kill
@@ -581,7 +598,7 @@ class Bullet(pygame.sprite.Sprite):
 
 
 class Grenade(pygame.sprite.Sprite):
-	def __init__(self, x, y, direction):
+	def __init__(self, x : int, y : int, direction : int):
 		pygame.sprite.Sprite.__init__(self)
 		self.timer = 100
 		self.velocityY = -11
@@ -596,7 +613,7 @@ class Grenade(pygame.sprite.Sprite):
 	def draw(self, engineWindow : pygame.Surface):
 		engineWindow.blit(self.image, self.rect)
 
-	def update(self, world):
+	def update(self, world : list):
 		self.velocityY += engineGravity
 		deltaX = self.direction * self.speed 
 		deltaY = self.velocityY
@@ -635,7 +652,7 @@ class Grenade(pygame.sprite.Sprite):
 					enemy.health -= 100
 
 class Explosion(pygame.sprite.Sprite):
-	def __init__(self, x, y):
+	def __init__(self, x : int, y : int):
 		pygame.sprite.Sprite.__init__(self)
 		self.explosions = []
 		for c in range(19):
@@ -665,3 +682,24 @@ class Explosion(pygame.sprite.Sprite):
 				self.image = self.explosions[self.index]
 		global screenScroll
 		self.rect.x += screenScroll
+
+class Button():
+	def __init__(self, x : int, y : int, image : pygame.Surface):
+		self.image = image
+		self.rect = self.image.get_rect()
+		self.rect.topleft = (x, y)
+		self.clicked = False
+
+	def draw(self, engineWindow : pygame.Surface):
+		action = False
+		position = pygame.mouse.get_pos()
+		if self.rect.collidepoint(position):
+			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+				action = True
+				self.clicked = True
+
+		if pygame.mouse.get_pressed()[0] == 0:
+			self.clicked = False
+
+		engineWindow.blit(self.image, (self.rect.x, self.rect.y))
+		return action
