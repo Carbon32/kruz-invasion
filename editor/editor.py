@@ -1,7 +1,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                             #
-#                   Land Invasion, Level Editor                               #
-#                                         Developer: Carbon                   #
+#                       Land Invasion, Level Editor                           #
+#                             Developer: Carbon                 		      #
 #                                                                             #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -33,7 +33,7 @@ editorRunning = True
 editorRows = 16
 editorColumns = 150
 tileSize = screenHeight // editorRows
-editorTiles = 24
+editorTiles = 22
 level = 0
 thisTile = 0
 scrollLeft = False
@@ -175,14 +175,14 @@ while editorRunning:
 
 	# Save & Load:
 	if buttonSave.draw():
-		with open(f'levels/level{level}_data.csv', 'w', newline='') as csvfile:
+		with open(f'levels/level{level}.csv', 'w', newline='') as csvfile:
 			writer = csv.writer(csvfile, delimiter = ',')
 			for row in worldData:
 				writer.writerow(row)
 
 	if butttonLoad.draw():
 		scroll = 0
-		with open(f'levels/level{level}_data.csv', newline='') as csvfile:
+		with open(f'levels/level{level}.csv', newline='') as csvfile:
 			reader = csv.reader(csvfile, delimiter = ',')
 			for x, row in enumerate(reader):
 				for y, tile in enumerate(row):
