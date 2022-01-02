@@ -12,6 +12,7 @@ from engine import *
 # Game Variables: #
 
 mainMenu = True
+levelSelector = True
 
 # Game Assets: #
 
@@ -29,7 +30,18 @@ loadGamePickups(healthPickup, grenadePickup, bulletPickup)
 # Buttons:
 play = loadGameImage('assets/Buttons/Play.png', 300, 300)
 exit = loadGameImage('assets/Buttons/Exit.png', 300, 300)
-again = loadStaticImage('assets/Buttons/Again.png')
+again = loadGameImage('assets/Buttons/Again.png', 300, 300)
+
+# Level Selector: 
+lvl1 = loadGameImage('assets/Buttons/Lvl_1.png', 100, 100)
+lvl2 = loadGameImage('assets/Buttons/Lvl_2.png', 100, 100)
+lvl3 = loadGameImage('assets/Buttons/Lvl_3.png', 100, 100)
+lvl4 = loadGameImage('assets/Buttons/Lvl_4.png', 100, 100)
+lvl5 = loadGameImage('assets/Buttons/Lvl_5.png', 100, 100)
+lvl6 = loadGameImage('assets/Buttons/Lvl_6.png', 100, 100)
+lvl7 = loadGameImage('assets/Buttons/Lvl_7.png', 100, 100)
+lvl8 = loadGameImage('assets/Buttons/Lvl_8.png', 100, 100)
+
 
 # Music:
 # playMusic("sounds/music.mp3", 0.1)
@@ -54,10 +66,21 @@ world.processData(worldData)
 # Buttons: #
 playButton = Button(window.screenWidth // 2 - 140, window.screenHeight // 2 - 300, play)
 exitButton = Button(window.screenWidth // 2 - 140, window.screenHeight // 2 - 100, exit)
-againButton = Button(window.screenWidth // 2 - 130, window.screenHeight // 2 - 100, again)
+againButton = Button(window.screenWidth // 2 - 140, window.screenHeight // 2 - 300, again)
+level1 = Button(window.screenWidth // 3, window.screenHeight // 2 - 300, lvl1)
+level2 = Button(window.screenWidth // 3, window.screenHeight // 2 - 150, lvl2)
+level3 = Button(window.screenWidth // 3, window.screenHeight // 2 - 0, lvl3)
+level4 = Button(window.screenWidth // 3, window.screenHeight // 2 - -150, lvl4)
+level5 = Button(window.screenWidth // 2 + 50, window.screenHeight // 2 - 300, lvl5)
+level6 = Button(window.screenWidth // 2 + 50, window.screenHeight // 2 - 150, lvl6)
+level7 = Button(window.screenWidth // 2 + 50, window.screenHeight // 2 - 0, lvl7)
+level8 = Button(window.screenWidth // 2 + 50, window.screenHeight // 2 - -150, lvl8)
 
 # Fade In:
 startFade = Fade(1, ((0, 0, 0)), 5)
+
+# Fade Out:
+deathFade = Fade(2, ((0, 0, 0)), 5)
 
 # Game Loop: #
 
@@ -71,8 +94,40 @@ while(window.engineRunning):
 		if(exitButton.draw(window.engineWindow)):
 			window.engineRunning = False
 	else:
-		updateGameMechanics(window.engineWindow, world, gunshot, explosion, jump, healthPick, grenadePick, ammoPick)
-		drawGameSprites(window.engineWindow, world)
-		startFade.fade(window.engineWindow, window.screenWidth, window.screenHeight)
+		if(levelSelector):
+			if(level1.draw(window.engineWindow)):
+				setGameLevel(1, world)
+				levelSelector = False
+			if(level2.draw(window.engineWindow)):
+				setGameLevel(2, world)
+				levelSelector = False
+			if(level3.draw(window.engineWindow)):
+				setGameLevel(3, world)
+				levelSelector = False
+			if(level4.draw(window.engineWindow)):
+				setGameLevel(4, world)
+				levelSelector = False
+			if(level5.draw(window.engineWindow)):
+				setGameLevel(5, world)
+				levelSelector = False
+			if(level6.draw(window.engineWindow)):
+				setGameLevel(6, world)
+				levelSelector = False
+			if(level7.draw(window.engineWindow)):
+				setGameLevel(7, world)
+				levelSelector = False
+			if(level8.draw(window.engineWindow)):
+				setGameLevel(8, world)
+				levelSelector = False
+		else:
+			if(playerLost()):
+				deathFade.fade(window.engineWindow, window.screenWidth, window.screenHeight)
+				if(againButton.draw(window.engineWindow)):
+					restartLevel(world)
+			else:
+				updateGameLevel(world)
+				updateGameMechanics(window.engineWindow, world, gunshot, explosion, jump, healthPick, grenadePick, ammoPick)
+				drawGameSprites(window.engineWindow, world)
+				startFade.fade(window.engineWindow, window.screenWidth, window.screenHeight)
 	window.updateDisplay()
 window.quit()

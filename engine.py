@@ -68,7 +68,7 @@ for r in range(levelRows):
 	row = [-1] * levelColumns
 	worldData.append(row)
 
-with open(f'levels/level{level}_data.csv', newline='') as csvfile:
+with open(f'levels/level{level}.csv', newline='') as csvfile:
 	reader = csv.reader(csvfile, delimiter=',')
 	for x, row in enumerate(reader):
 		for y, tile in enumerate(row):
@@ -76,19 +76,42 @@ with open(f'levels/level{level}_data.csv', newline='') as csvfile:
 
 # Game Functions: #
 
-def updateGameLevel(complete : bool, world : list):
+def playerLost():
+	for player in playersGroup:
+		if(player.health <= 0):
+			return True
+
+def setGameLevel(newLevel : int, world : list):
 	global level
-	if(complete):
+	if(newLevel > 8):
+		newLevel = 1
+	else:
+		level = newLevel
+		worldData = resetLevel()
+		with open(f'levels/level{newLevel}.csv', newline='') as csvfile:
+			reader = csv.reader(csvfile, delimiter=',')
+			for x, row in enumerate(reader):
+				for y, tile in enumerate(row):
+					worldData[x][y] = int(tile)
+			world.obstacleList = []
+			world.processData(worldData)
+
+def updateGameLevel(world : list):
+	global level, levelComplete, worldData, backgroundScroll
+	if(levelComplete):
 		level += 1
+		if(level > 8):
+			level = 1
 		backgroundScroll = 0
 		worldData = resetLevel()
-		with open(f'levels/level{level}_data.csv', newline='') as csvfile:
+		with open(f'levels/level{level}.csv', newline='') as csvfile:
 			reader = csv.reader(csvfile, delimiter=',')
 			for x, row in enumerate(reader):
 				for y, tile in enumerate(row):
 					worldData[x][y] = int(tile)
 		world.obstacleList = []
 		world.processData(worldData)
+		levelComplete = False
 
 def assignGameSounds(gunshot_sound : mixer.Sound, explosion_sound : mixer.Sound, jump_sound : mixer.Sound, health_pick : mixer.Sound, grenade_pick : mixer.Sound, ammo_pick : mixer.Sound):
 	global gunshot, jump, explosion, healthPick, grenadePick, ammoPick
@@ -104,11 +127,14 @@ def drawText(engineWindow : pygame.Surface, text : str, color : tuple, x : int, 
 	engineWindow.blit(image, (x, y))
 
 def drawStats(engineWindow : pygame.Surface):
+	global level
 	for player in playersGroup:
 		drawText(engineWindow, f'Ammo: {player.ammo}', (48, 45, 45), 30, 20)
 		drawText(engineWindow, f'Grenades: {player.grenades}', (48, 45, 45), 150, 20)
+	drawText(engineWindow, f'Level: {level}', (48, 45, 45), 400, 20)
 
 def resetLevel():
+	global levelRows, levelColumns
 	playersGroup.empty()
 	enemyGroup.empty()
 	bulletGroup.empty()
@@ -121,6 +147,18 @@ def resetLevel():
 		row = [-1] * levelColumns
 		data.append(row)
 	return data
+
+def restartLevel(world : list):
+	global level, worldData, backgroundScroll
+	backgroundScroll = 0
+	worldData = resetLevel()
+	with open(f'levels/level{level}.csv', newline='') as csvfile:
+		reader = csv.reader(csvfile, delimiter=',')
+		for x, row in enumerate(reader):
+			for y, tile in enumerate(row):
+				worldData[x][y] = int(tile)
+	world.obstacleList = []
+	world.processData(worldData)
 
 def loadGamePickups(healthPickup : pygame.Surface, grenadePickup : pygame.Surface, bulletPickup : pygame.Surface):
 	global pickups
@@ -140,7 +178,6 @@ def loadStaticImage(path : str):
 		return image
 
 def updateGameMechanics(engineWindow : pygame.Surface, world : list, gunshot_sound : mixer.Sound, explosion_sound : mixer.Sound, jump_sound : mixer.Sound, health_pick : mixer.Sound, grenade_pick : mixer.Sound, ammo_pick : mixer.Sound):
-		global levelComplete
 		playersGroup.update(world)
 		for enemy in enemyGroup:
 			enemy.handleAI(world)
@@ -150,7 +187,6 @@ def updateGameMechanics(engineWindow : pygame.Surface, world : list, gunshot_sou
 		pickupsGroup.update(engineWindow)
 		chemicalsGroup.update()
 		exitsGroup.update()
-		updateGameLevel(levelComplete, world)
 		assignGameSounds(gunshot_sound, explosion_sound, jump_sound, health_pick, grenade_pick, ammo_pick)
 
 def drawGameSprites(engineWindow : pygame.Surface, world : list):
