@@ -44,7 +44,7 @@ lvl8 = loadGameImage('assets/Buttons/Lvl_8.png', 100, 100)
 
 
 # Music:
-# playMusic("sounds/music.mp3", 0.1)
+playMusic("sounds/music.mp3", 0.1)
 
 # Sounds:
 gunshot = loadGameSound("sounds/shoot.mp3", 0.2)
@@ -78,9 +78,6 @@ level8 = Button(window.screenWidth // 2 + 50, window.screenHeight // 2 - -150, l
 
 # Fade In:
 startFade = Fade(1, ((0, 0, 0)), 5)
-
-# Fade Out:
-deathFade = Fade(2, ((0, 0, 0)), 5)
 
 # Game Loop: #
 
@@ -121,7 +118,6 @@ while(window.engineRunning):
 				levelSelector = False
 		else:
 			if(playerLost()):
-				deathFade.fade(window.engineWindow, window.screenWidth, window.screenHeight)
 				if(againButton.draw(window.engineWindow)):
 					restartLevel(world)
 			else:

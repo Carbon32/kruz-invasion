@@ -256,6 +256,8 @@ class Window():
 			if(event.type == pygame.QUIT):
 				self.engineRunning = False
 		pygame.display.update()
+		if(pygame.key.get_pressed()[pygame.K_ESCAPE]):
+			self.engineRunning = False
 
 	def limitFPS(self, fps : int):
 		self.fpsLimit.tick(fps)
@@ -421,8 +423,6 @@ class Soldier(pygame.sprite.Sprite):
 				self.updateAction(1)
 			if(pygame.key.get_pressed()[pygame.K_SPACE] and self.alive and self.inAir == False):
 				self.jump = True
-			if(pygame.key.get_pressed()[pygame.K_ESCAPE]):
-				pygame.quit()
 			if(pygame.key.get_pressed()[pygame.K_e]):
 				shoot = True
 			if(pygame.key.get_pressed()[pygame.K_a]):
@@ -544,7 +544,7 @@ class Soldier(pygame.sprite.Sprite):
 			self.rect.x += screenScroll
 
 	def updateAnimation(self):
-		animTime = 80
+		animTime = 90
 		self.image = self.animationList[self.action][self.index]
 		if(pygame.time.get_ticks() - self.time > animTime):
 			self.time = pygame.time.get_ticks()
@@ -651,7 +651,7 @@ class Bullet(pygame.sprite.Sprite):
 	def __init__(self, x : int, y : int, direction : int):
 		pygame.sprite.Sprite.__init__(self)
 		self.speed = 10
-		self.image = pygame.image.load('assets/Bullet.png')
+		self.image = pygame.image.load('assets/Bullet/Bullet.png')
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 		self.direction = direction
@@ -688,7 +688,7 @@ class Grenade(pygame.sprite.Sprite):
 		self.timer = 100
 		self.velocityY = -11
 		self.speed = 7
-		self.image = pygame.image.load('assets/Grenade.png').convert_alpha()
+		self.image = pygame.image.load('assets/Grenade/Grenade.png').convert_alpha()
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 		self.width = self.image.get_width()
