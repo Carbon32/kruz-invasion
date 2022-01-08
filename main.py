@@ -124,6 +124,6 @@ while(window.engineRunning):
 				updateGameLevel(world)
 				updateGameMechanics(window.engineWindow, world, gunshot, explosion, jump, healthPick, grenadePick, ammoPick)
 				drawGameSprites(window.engineWindow, world)
-				startFade.fade(window.engineWindow, window.screenWidth, window.screenHeight)
+			startFade.fade(window.engineWindow, window.screenWidth, window.screenHeight)
 	window.updateDisplay()
 window.quit()
