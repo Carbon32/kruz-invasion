@@ -42,6 +42,9 @@ lvl6 = loadGameImage('assets/Buttons/Lvl_6.png', 100, 100)
 lvl7 = loadGameImage('assets/Buttons/Lvl_7.png', 100, 100)
 lvl8 = loadGameImage('assets/Buttons/Lvl_8.png', 100, 100)
 
+# Game Icon: 
+
+setGameIcon('assets/Player/Idle/0.png')
 
 # Music:
 playMusic("sounds/music.mp3", 0.1)

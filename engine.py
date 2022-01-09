@@ -81,6 +81,10 @@ def playerLost():
 		if(player.health <= 0):
 			return True
 
+def setGameIcon(path : str):
+	icon = pygame.image.load(path)
+	pygame.display.set_icon(icon)
+
 def setGameLevel(newLevel : int, world : list):
 	global level
 	if(newLevel > 8):
