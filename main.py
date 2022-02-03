@@ -98,7 +98,7 @@ while(window.engineRunning):
 			if(level1.draw(window.engineWindow)):
 				setGameLevel(1, world)
 				levelSelector = False
-				
+
 			if(level2.draw(window.engineWindow)):
 				setGameLevel(2, world)
 				levelSelector = False
@@ -134,6 +134,8 @@ while(window.engineRunning):
 				updateGameLevel(world)
 				updateGameMechanics(window.engineWindow, world, gunshot, explosion, jump, healthPick, grenadePick, ammoPick)
 				drawGameSprites(window.engineWindow, world)
+				drawGameParticles(window.engineWindow, "gun", (128, 128, 128))
+				drawGameParticles(window.engineWindow, "blood", (255, 0, 0))
 			startFade.fade(window.engineWindow, window.screenWidth, window.screenHeight)
 	window.updateDisplay()
 window.quit()

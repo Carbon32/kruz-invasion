@@ -40,6 +40,11 @@ gunshot = None ; explosion = None ; jump = None ; healthPick = None ; grenadePic
 
 pickups = {}
 
+# Particles
+
+runParticles = [] ; bloodParticles = [] ; gunParticles = [] ; jumpParticles = []
+
+
 # Sprite Groups: #
 
 healthBarGroup = []
@@ -68,6 +73,75 @@ with open(f'levels/level{level}.csv', newline='') as csvfile:
 			worldData[x][y] = int(tile)
 
 # Game Functions: #
+
+def circleSurface(radius : int, color : tuple):
+	surface = pygame.Surface((radius * 2, radius * 2))
+	pygame.draw.circle(surface, color, (radius, radius), radius)
+	surface.set_colorkey((0, 0, 0))
+	return surface
+
+def addGameParticle(particleType : str, x : int, y : int):
+	global gunParticles, bloodParticles, runParticles, jumpParticles
+	particleType.lower()
+	if(particleType == "gun"):
+		gunParticles.append([[x, y], [random.randint(0, 4) / 1 - 1, -0.8], random.randint(4, 6)])
+
+	elif(particleType == "blood"):
+		bloodParticles.append([[x + 20, y + 30], [random.randint(0, 20) / 2 - 1, -1], random.randint(6, 8)])
+
+	elif(particleType == "run"):
+		runParticles.append([[x + 10, y + 60], [-1, -1], random.randint(1, 2)])
+
+	elif(particleType == "jump"):
+		jumpParticles.append([[x, y], [random.randint(0, 10) / 10 - 1, -2], random.randint(4, 6)])
+
+	else:
+		print(f"Cannot find {particleType} in the game particles list. The particle won't be displayed.")
+
+def drawGameParticles(engineWindow : pygame.Surface, particleType : str, color : tuple):
+	global gunParticles, bloodParticles, runParticles, jumpParticles
+	if(particleType == "gun"):
+		for particle in gunParticles:
+			particle[0][0] += particle[1][0]
+			particle[0][1] += particle[1][1]
+			particle[2] -= 0.1
+			pygame.draw.circle(engineWindow, color, [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
+			if(particle[2] <= 0):
+				gunParticles.remove(particle)
+
+	elif(particleType == "blood"):
+		for particle in bloodParticles:
+			particle[0][0] += particle[1][0]
+			particle[0][1] += particle[1][1]
+			particle[2] -= 0.1
+			pygame.draw.circle(engineWindow, color, [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
+			if(particle[2] <= 0):
+				bloodParticles.remove(particle)
+
+	elif(particleType == "run"):
+		for particle in runParticles:
+			particle[0][0] += particle[1][0]
+			particle[0][1] += particle[1][1]
+			particle[2] -= 0.1
+			pygame.draw.circle(engineWindow, color, [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
+			radius = particle[2] * 2
+			engineWindow.blit(circleSurface(radius, color), (int(particle[0][0] - radius), int(particle[0][1] - radius)), special_flags = pygame.BLEND_RGB_ADD)
+			if(particle[2] <= 0):
+				runParticles.remove(particle)
+
+	elif(particleType == "jump"):
+		for particle in jumpParticles:
+			particle[0][0] += particle[1][0]
+			particle[0][1] += particle[1][1]
+			particle[2] -= 0.1
+			pygame.draw.circle(engineWindow, color, [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
+			radius = particle[2] * 2
+			engineWindow.blit(circleSurface(radius, (51, 25, 0)), (int(particle[0][0] - radius), int(particle[0][1] - radius)), special_flags = pygame.BLEND_RGB_ADD)
+			if(particle[2] <= 0):
+				jumpParticles.remove(particle)
+
+	else:
+		print(f"Cannot find {particleType} in the game particles list. The particle won't be displayed.")
 
 def playerLost():
 	for player in playersGroup:
@@ -573,6 +647,10 @@ class Soldier(pygame.sprite.Sprite):
 			bulletGroup.add(bullet)
 			self.ammo -= 1
 			gunshot.play()
+			if(self.direction == 1):
+				addGameParticle("gun", self.rect.centerx + 15, self.rect.centery)
+			else:
+				addGameParticle("gun", self.rect.centerx - 15, self.rect.centery)
 
 	def draw(self, engineWindow : pygame.Surface):
 		engineWindow.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
@@ -668,12 +746,14 @@ class Bullet(pygame.sprite.Sprite):
 			if(pygame.sprite.spritecollide(player, bulletGroup, False)):
 				if(player.alive):
 					player.health -= 5
+					addGameParticle("blood", player.rect.x, player.rect.y)
 					self.kill()
 
 		for enemy in enemyGroup:
 			if(pygame.sprite.spritecollide(enemy, bulletGroup, False)):
 				if(enemy.alive):
 					enemy.health -= 25
+					addGameParticle("blood", enemy.rect.x, enemy.rect.y)
 					self.kill()
 
 
