@@ -90,10 +90,10 @@ def addGameParticle(particleType : str, x : int, y : int):
 		bloodParticles.append([[x + 20, y + 30], [random.randint(0, 20) / 2 - 1, -1], random.randint(6, 8)])
 
 	elif(particleType == "run"):
-		runParticles.append([[x + 10, y + 60], [-1, -1], random.randint(1, 2)])
+		runParticles.append([[x + 10, y + 60], [random.randint(0, 4), -1], random.randint(1, 3)])
 
 	elif(particleType == "jump"):
-		jumpParticles.append([[x, y], [random.randint(0, 10) / 10 - 1, -2], random.randint(4, 6)])
+		jumpParticles.append([[x + 10, y + 60], [random.randint(0, 1), -0.5], random.randint(4, 6)])
 
 	else:
 		print(f"Cannot find {particleType} in the game particles list. The particle won't be displayed.")
@@ -124,8 +124,6 @@ def drawGameParticles(engineWindow : pygame.Surface, particleType : str, color :
 			particle[0][1] += particle[1][1]
 			particle[2] -= 0.1
 			pygame.draw.circle(engineWindow, color, [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
-			radius = particle[2] * 2
-			engineWindow.blit(circleSurface(radius, color), (int(particle[0][0] - radius), int(particle[0][1] - radius)), special_flags = pygame.BLEND_RGB_ADD)
 			if(particle[2] <= 0):
 				runParticles.remove(particle)
 
@@ -135,8 +133,6 @@ def drawGameParticles(engineWindow : pygame.Surface, particleType : str, color :
 			particle[0][1] += particle[1][1]
 			particle[2] -= 0.1
 			pygame.draw.circle(engineWindow, color, [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
-			radius = particle[2] * 2
-			engineWindow.blit(circleSurface(radius, (51, 25, 0)), (int(particle[0][0] - radius), int(particle[0][1] - radius)), special_flags = pygame.BLEND_RGB_ADD)
 			if(particle[2] <= 0):
 				jumpParticles.remove(particle)
 
@@ -517,17 +513,22 @@ class Soldier(pygame.sprite.Sprite):
 			deltaX = -self.speed
 			self.flip = True
 			self.direction = -1
+			if(self.inAir == False):
+				addGameParticle("run", self.rect.x + 40, self.rect.y)
 
 		if(self.moveRight):
 			deltaX = self.speed
 			self.flip = False
 			self.direction = 1
+			if(self.inAir == False):
+				addGameParticle("run", self.rect.x, self.rect.y)
 
 		if(self.jump == True and self.inAir == False):
 			self.velocityY = -10
 			self.jump = False
 			self.inAir = True
 			jump.play()
+			addGameParticle("jump", self.rect.x, self.rect.y)
 
 		self.velocityY += engineGravity
 		if(self.velocityY > 20):

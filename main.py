@@ -136,6 +136,8 @@ while(window.engineRunning):
 				drawGameSprites(window.engineWindow, world)
 				drawGameParticles(window.engineWindow, "gun", (128, 128, 128))
 				drawGameParticles(window.engineWindow, "blood", (255, 0, 0))
+				drawGameParticles(window.engineWindow, "run", (160, 82, 45))
+				drawGameParticles(window.engineWindow, "jump", (160, 82, 45))
 			startFade.fade(window.engineWindow, window.screenWidth, window.screenHeight)
 	window.updateDisplay()
 window.quit()
