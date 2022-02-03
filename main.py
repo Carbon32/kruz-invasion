@@ -98,24 +98,31 @@ while(window.engineRunning):
 			if(level1.draw(window.engineWindow)):
 				setGameLevel(1, world)
 				levelSelector = False
+				
 			if(level2.draw(window.engineWindow)):
 				setGameLevel(2, world)
 				levelSelector = False
+
 			if(level3.draw(window.engineWindow)):
 				setGameLevel(3, world)
 				levelSelector = False
+
 			if(level4.draw(window.engineWindow)):
 				setGameLevel(4, world)
 				levelSelector = False
+
 			if(level5.draw(window.engineWindow)):
 				setGameLevel(5, world)
 				levelSelector = False
+
 			if(level6.draw(window.engineWindow)):
 				setGameLevel(6, world)
 				levelSelector = False
+
 			if(level7.draw(window.engineWindow)):
 				setGameLevel(7, world)
 				levelSelector = False
+
 			if(level8.draw(window.engineWindow)):
 				setGameLevel(8, world)
 				levelSelector = False

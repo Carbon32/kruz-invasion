@@ -7,11 +7,7 @@
 
 # Imports: #
 
-import pygame
-from pygame import mixer
-import random
-import os
-import csv
+import pygame ; from pygame import mixer ; import random ; import os ; import csv
 
 # Pygame and Mixer Initializations: #
 
@@ -20,36 +16,35 @@ mixer.init()
 
 # Engine Variables: #
 
-scrollThresh = 300
-screenScroll = 0
-backgroundScroll = 0
+# Scrolling: 
+
+scrollThresh = 300  ; screenScroll = 0 ; backgroundScroll = 0
+
+# Gravity:
+
 engineGravity = 0.5
 
+# Level:
+
 level = 1
-levelRows = 16
-levelColumns = 150
-tileSize = 48
-engineTiles = 22
-levelComplete = False
 
-gunshot = mixer.Sound
-explosion = mixer.Sound
-jump = mixer.Sound
-healthPick = mixer.Sound
-grenadePick = mixer.Sound
-ammoPick = mixer.Sound
+# Game Map:
 
-# Groups: #
+levelRows = 16 ; levelColumns = 150 ; tileSize = 48 ; engineTiles = 22 ; levelComplete = False
+
+# Sounds:
+
+gunshot = None ; explosion = None ; jump = None ; healthPick = None ; grenadePick = None ; ammoPick = None
+
+# Pickups: 
+
+pickups = {}
+
+# Sprite Groups: #
 
 healthBarGroup = []
-playersGroup = pygame.sprite.Group()
-bulletGroup = pygame.sprite.Group()
-grenadeGroup = pygame.sprite.Group()
-explosionGroup = pygame.sprite.Group()
-enemyGroup = pygame.sprite.Group()
-chemicalsGroup = pygame.sprite.Group()
-pickupsGroup = pygame.sprite.Group()
-exitsGroup = pygame.sprite.Group()
+playersGroup = pygame.sprite.Group() ; bulletGroup = pygame.sprite.Group() ; grenadeGroup = pygame.sprite.Group() ; explosionGroup = pygame.sprite.Group()
+enemyGroup = pygame.sprite.Group() ; chemicalsGroup = pygame.sprite.Group() ; pickupsGroup = pygame.sprite.Group() ; exitsGroup = pygame.sprite.Group()
 
 # Tiles: #
 
@@ -59,9 +54,7 @@ for c in range(engineTiles):
 	image = pygame.transform.scale(image, (tileSize, tileSize))
 	allTiles.append(image)
 
-pickups = {}
-
-# Levels: #
+# Level Loading: #
 
 worldData = []
 for r in range(levelRows):
