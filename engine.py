@@ -54,10 +54,7 @@ enemyGroup = pygame.sprite.Group() ; chemicalsGroup = pygame.sprite.Group() ; pi
 # Tiles: #
 
 allTiles = []
-for c in range(engineTiles):
-	image = pygame.image.load(f'assets/Tiles/{c}.png')
-	image = pygame.transform.scale(image, (tileSize, tileSize))
-	allTiles.append(image)
+
 
 # Level Loading: #
 
@@ -73,6 +70,12 @@ with open(f'levels/level{level}.csv', newline='') as csvfile:
 			worldData[x][y] = int(tile)
 
 # Game Functions: #
+
+def loadTiles():
+	for c in range(engineTiles):
+		image = pygame.image.load(f'assets/Tiles/{c}.png').convert_alpha()
+		image = pygame.transform.scale(image, (tileSize, tileSize))
+		allTiles.append(image)
 
 def addGameParticle(particleType : str, x : int, y : int):
 	global gunParticles, bloodParticles, runParticles, jumpParticles, explosionParticles
@@ -242,7 +245,7 @@ def loadGamePickups(healthPickup : pygame.Surface, grenadePickup : pygame.Surfac
 	}
 
 def loadGameImage(path : str, width : int, height : int):
-		image = pygame.image.load(path)
+		image = pygame.image.load(path).convert_alpha()
 		image = pygame.transform.scale(image, (width, height))
 		return image
 
@@ -453,7 +456,7 @@ class Soldier(pygame.sprite.Sprite):
 			tempList = []
 			framesNumber = len(os.listdir(f'assets/{self.type}/{animation}'))
 			for c in range(framesNumber): # Loading all animations
-				gameImage = pygame.image.load(f'assets/{self.type}/{animation}/{c}.png')
+				gameImage = pygame.image.load(f'assets/{self.type}/{animation}/{c}.png').convert_alpha()
 				gameImage = pygame.transform.scale(gameImage, (gameImage.get_width() * scale, gameImage.get_height() * scale))
 				tempList.append(gameImage)
 			self.animationList.append(tempList)

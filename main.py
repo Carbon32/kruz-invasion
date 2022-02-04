@@ -14,6 +14,11 @@ from engine import *
 mainMenu = True
 levelSelector = True
 
+# Game Window: #
+
+window = Window(1024, 768, "Land Invasion:")
+window.init()
+
 # Game Assets: #
 
 # Background:
@@ -57,10 +62,9 @@ healthPick = loadGameSound("sounds/healthPickup.wav", 0.2)
 grenadePick = loadGameSound("sounds/grenadePickup.wav", 0.2)
 ammoPick = loadGameSound("sounds/ammoPickup.mp3", 0.2)
 
-# Game Window: #
+# Tiles:
 
-window = Window(1024, 768, "Land Invasion:")
-window.init()
+loadTiles()
 
 # World: #
 world = World()
