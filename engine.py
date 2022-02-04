@@ -611,8 +611,10 @@ class Soldier(pygame.sprite.Sprite):
 							if(self.direction == 1):
 								move = 1
 								self.flip = False
+								addGameParticle("run", self.rect.x, self.rect.y)
 							else:
 								self.flip = True
+								addGameParticle("run", self.rect.x + 25, self.rect.y)
 								move = -1
 							self.rect.x += move
 							self.updateAction(1)
