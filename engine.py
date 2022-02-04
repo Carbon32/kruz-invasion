@@ -74,12 +74,6 @@ with open(f'levels/level{level}.csv', newline='') as csvfile:
 
 # Game Functions: #
 
-def circleSurface(radius : int, color : tuple):
-	surface = pygame.Surface((radius * 2, radius * 2))
-	pygame.draw.circle(surface, color, (radius, radius), radius)
-	surface.set_colorkey((0, 0, 0))
-	return surface
-
 def addGameParticle(particleType : str, x : int, y : int):
 	global gunParticles, bloodParticles, runParticles, jumpParticles, explosionParticles
 	particleType.lower()
