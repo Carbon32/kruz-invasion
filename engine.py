@@ -42,7 +42,7 @@ pickups = {}
 
 # Particles
 
-runParticles = [] ; bloodParticles = [] ; gunParticles = [] ; jumpParticles = []
+runParticles = [] ; bloodParticles = [] ; gunParticles = [] ; jumpParticles = [] ; explosionParticles = []
 
 
 # Sprite Groups: #
@@ -81,25 +81,28 @@ def circleSurface(radius : int, color : tuple):
 	return surface
 
 def addGameParticle(particleType : str, x : int, y : int):
-	global gunParticles, bloodParticles, runParticles, jumpParticles
+	global gunParticles, bloodParticles, runParticles, jumpParticles, explosionParticles
 	particleType.lower()
 	if(particleType == "gun"):
-		gunParticles.append([[x, y], [random.randint(0, 4) / 1 - 1, -0.8], random.randint(4, 6)])
+		gunParticles.append([[x, y], [random.randint(-4, 4), -0.8], random.randint(4, 6)])
 
 	elif(particleType == "blood"):
-		bloodParticles.append([[x + 20, y + 30], [random.randint(0, 20) / 2 - 1, -1], random.randint(6, 8)])
+		bloodParticles.append([[x + 20, y + 30], [random.randint(-3, 3), -1], random.randint(6, 8)])
 
 	elif(particleType == "run"):
-		runParticles.append([[x + 10, y + 60], [random.randint(0, 4), -1], random.randint(1, 3)])
+		runParticles.append([[x + 10, y + 60], [random.randint(-4, 4), -1], random.randint(1, 3)])
 
 	elif(particleType == "jump"):
-		jumpParticles.append([[x + 10, y + 60], [random.randint(0, 1), -0.5], random.randint(4, 6)])
+		jumpParticles.append([[x + 10, y + 60], [0, -2], random.randint(4, 6)])
+
+	elif(particleType == "explosion"):
+		explosionParticles.append([[x, y + 20], [random.randint(-4, 4), -10], 40])
 
 	else:
 		print(f"Cannot find {particleType} in the game particles list. The particle won't be displayed.")
 
 def drawGameParticles(engineWindow : pygame.Surface, particleType : str, color : tuple):
-	global gunParticles, bloodParticles, runParticles, jumpParticles
+	global gunParticles, bloodParticles, runParticles, jumpParticles, explosionParticles
 	if(particleType == "gun"):
 		for particle in gunParticles:
 			particle[0][0] += particle[1][0]
@@ -135,6 +138,15 @@ def drawGameParticles(engineWindow : pygame.Surface, particleType : str, color :
 			pygame.draw.circle(engineWindow, color, [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
 			if(particle[2] <= 0):
 				jumpParticles.remove(particle)
+
+	elif(particleType == "explosion"):
+		for particle in explosionParticles:
+			particle[0][0] += particle[1][0]
+			particle[0][1] += particle[1][1]
+			particle[2] -= 0.1
+			pygame.draw.circle(engineWindow, color, [int(particle[0][0]), int(particle[0][1])], int(particle[2]))
+			if(particle[2] <= 0):
+				explosionParticles.remove(particle)
 
 	else:
 		print(f"Cannot find {particleType} in the game particles list. The particle won't be displayed.")
@@ -807,6 +819,8 @@ class Grenade(pygame.sprite.Sprite):
 			self.kill()
 			explosionEffect = Explosion(self.rect.x, self.rect.y)
 			explosionGroup.add(explosionEffect)
+			for i in range(5):
+				addGameParticle("explosion", self.rect.x, self.rect.y)
 			for player in playersGroup:
 				if (abs(self.rect.centerx - player.rect.centerx) < tileSize * 2 and (self.rect.centery - player.rect.centery) < tileSize * 2):
 					player.health -= 50
