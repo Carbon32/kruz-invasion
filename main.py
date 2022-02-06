@@ -84,65 +84,70 @@ level7 = Button(window.screenWidth // 2 + 50, window.screenHeight // 2 - 0, lvl7
 level8 = Button(window.screenWidth // 2 + 50, window.screenHeight // 2 - -150, lvl8)
 
 # Fade In:
+
 startFade = Fade(1, ((0, 0, 0)), 5)
 
 # Game Loop: #
 
-while(window.engineRunning):
-	window.limitFPS(60)
-	window.setBackground(sky, mountain, trees, 0, 0)
-	if(mainMenu == True):
-		if(playButton.draw(window.engineWindow)):
-			mainMenu = False
+def main():
+	global mainMenu, levelSelector
+	while(window.engineRunning):
+		window.limitFPS(60)
+		window.setBackground(sky, mountain, trees, 0, 0)
+		if(mainMenu == True):
+			if(playButton.draw(window.engineWindow)):
+				mainMenu = False
 
-		if(exitButton.draw(window.engineWindow)):
-			window.engineRunning = False
-	else:
-		if(levelSelector):
-			if(level1.draw(window.engineWindow)):
-				setGameLevel(1, world)
-				levelSelector = False
-
-			if(level2.draw(window.engineWindow)):
-				setGameLevel(2, world)
-				levelSelector = False
-
-			if(level3.draw(window.engineWindow)):
-				setGameLevel(3, world)
-				levelSelector = False
-
-			if(level4.draw(window.engineWindow)):
-				setGameLevel(4, world)
-				levelSelector = False
-
-			if(level5.draw(window.engineWindow)):
-				setGameLevel(5, world)
-				levelSelector = False
-
-			if(level6.draw(window.engineWindow)):
-				setGameLevel(6, world)
-				levelSelector = False
-
-			if(level7.draw(window.engineWindow)):
-				setGameLevel(7, world)
-				levelSelector = False
-
-			if(level8.draw(window.engineWindow)):
-				setGameLevel(8, world)
-				levelSelector = False
+			if(exitButton.draw(window.engineWindow)):
+				window.engineRunning = False
 		else:
-			if(playerLost()):
-				if(againButton.draw(window.engineWindow)):
-					restartLevel(world)
+			if(levelSelector):
+				if(level1.draw(window.engineWindow)):
+					setGameLevel(1, world)
+					levelSelector = False
+
+				if(level2.draw(window.engineWindow)):
+					setGameLevel(2, world)
+					levelSelector = False
+
+				if(level3.draw(window.engineWindow)):
+					setGameLevel(3, world)
+					levelSelector = False
+
+				if(level4.draw(window.engineWindow)):
+					setGameLevel(4, world)
+					levelSelector = False
+
+				if(level5.draw(window.engineWindow)):
+					setGameLevel(5, world)
+					levelSelector = False
+
+				if(level6.draw(window.engineWindow)):
+					setGameLevel(6, world)
+					levelSelector = False
+
+				if(level7.draw(window.engineWindow)):
+					setGameLevel(7, world)
+					levelSelector = False
+
+				if(level8.draw(window.engineWindow)):
+					setGameLevel(8, world)
+					levelSelector = False
 			else:
-				updateGameLevel(world)
-				updateGameMechanics(window.engineWindow, world, gunshot, explosion, jump, healthPick, grenadePick, ammoPick)
-				drawGameSprites(window.engineWindow, world)
-				drawGameParticles(window.engineWindow, "gun", (128, 128, 128))
-				drawGameParticles(window.engineWindow, "explosion", (128, 128, 128))
-				drawGameParticles(window.engineWindow, "blood", (255, 0, 0))
-				drawGameParticles(window.engineWindow, "run", (160, 82, 45))
-				drawGameParticles(window.engineWindow, "jump", (160, 82, 45))
-			startFade.fade(window.engineWindow, window.screenWidth, window.screenHeight)
-	window.updateDisplay()
-window.quit()
+				if(playerLost()):
+					if(againButton.draw(window.engineWindow)):
+						restartLevel(world)
+				else:
+					updateGameLevel(world)
+					updateGameMechanics(window.engineWindow, world, gunshot, explosion, jump, healthPick, grenadePick, ammoPick)
+					drawGameSprites(window.engineWindow, world)
+					drawGameParticles(window.engineWindow, "gun", (128, 128, 128))
+					drawGameParticles(window.engineWindow, "explosion", (128, 128, 128))
+					drawGameParticles(window.engineWindow, "blood", (255, 0, 0))
+					drawGameParticles(window.engineWindow, "run", (160, 82, 45))
+					drawGameParticles(window.engineWindow, "jump", (160, 82, 45))
+				startFade.fade(window.engineWindow, window.screenWidth, window.screenHeight)
+		window.updateDisplay()
+	window.quit()
+
+main()

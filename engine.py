@@ -14,6 +14,10 @@ import pygame ; from pygame import mixer ; import random ; import os ; import cs
 pygame.init()
 mixer.init()
 
+# Event Handling: #
+
+pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
+
 # Engine Variables: #
 
 # Scrolling: 
@@ -627,7 +631,7 @@ class Soldier(pygame.sprite.Sprite):
 			self.rect.x += screenScroll
 
 	def updateAnimation(self):
-		animTime = 90
+		animTime = 80
 		self.image = self.animationList[self.action][self.index]
 		if(pygame.time.get_ticks() - self.time > animTime):
 			self.time = pygame.time.get_ticks()
@@ -738,7 +742,8 @@ class Bullet(pygame.sprite.Sprite):
 	def __init__(self, x : int, y : int, direction : int):
 		pygame.sprite.Sprite.__init__(self)
 		self.speed = 10
-		self.image = pygame.image.load('assets/Bullet/Bullet.png')
+		self.image = pygame.image.load('assets/Bullet/Bullet.png').convert_alpha()
+		self.image = pygame.transform.scale(self.image, (6, 6))
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 		self.direction = direction
