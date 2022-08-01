@@ -100,7 +100,6 @@ world.loadTiles()
 # World: #
 
 world.setGameLevel(1)
-world.generateWorld()
 
 # Fade In:
 
