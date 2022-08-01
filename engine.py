@@ -193,9 +193,9 @@ class Game():
 
 		pygame.display.update()
 
-	def updateGameMechanics(self, game, world, particles):
+	def updateGameMechanics(self, world, particles):
 
-		game.player.update(world, particles)
+		self.player.update(world, particles)
 
 		for enemy in self.enemyGroup:
 				
@@ -229,7 +229,7 @@ class Game():
 
 			exit.update()
 
-	def drawGameSprites(self, game, world, ui):
+	def drawGameSprites(self, world, ui):
 
 			world.render()
 
@@ -265,7 +265,7 @@ class Game():
 
 				explosion.draw(self.display)
 
-			game.player.draw(self.display)
+			self.player.draw(self.display)
 
 
 			ui.drawStats()
@@ -723,7 +723,7 @@ class Particles():
 			else:
 				print(f"Cannot find {particleType} in the game particles list. The particle won't be displayed.")
 
-	def drawParticles(self, game):
+	def drawParticles(self):
 
 		self.drawGameParticles("gun")
 		self.drawGameParticles("explosion")

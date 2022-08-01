@@ -132,9 +132,9 @@ while(game.engineRunning):
 
 		else:
 
-			game.updateGameMechanics(game, world, particles)
-			game.drawGameSprites(game, world, ui)
-			particles.drawParticles(game)
+			game.updateGameMechanics(world, particles)
+			game.drawGameSprites(world, ui)
+			particles.drawParticles()
 			menu.checkDeath(world)
 			if(gameFade.fade()):
 
