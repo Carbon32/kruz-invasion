@@ -290,8 +290,8 @@ class Menu():
 		# Level Designs:
 
 		self.levelDesigns = []
-		for i in range(len(os.listdir('assets/levels/'))):
-			self.levelDesigns.append(loadGameImage(f'assets/levels/level{i}.png', self.game.screenWidth // 2, self.game.screenHeight // 2))
+		for i in range(len(os.listdir('assets/Levels/'))):
+			self.levelDesigns.append(loadGameImage(f'assets/Levels/Level{i}.png', self.game.screenWidth // 2, self.game.screenHeight // 2))
 
 		# Level Selector:
 
@@ -783,14 +783,14 @@ class AssetsManager():
 			"Editor" : loadGameImage('assets/Buttons/Editor.png', self.game.screenWidth // 6, self.game.screenWidth // 12),
 			"Exit" : loadGameImage('assets/Buttons/Exit.png', self.game.screenWidth // 6, self.game.screenWidth // 12),
 			"Again" : loadGameImage('assets/Buttons/Again.png', self.game.screenWidth // 6, self.game.screenWidth // 12),
-			"Select" : loadGameImage('assets/Buttons/select.png', self.game.screenWidth // 6, self.game.screenWidth // 12),
+			"Select" : loadGameImage('assets/Buttons/Select.png', self.game.screenWidth // 6, self.game.screenWidth // 12),
 			"Save" : loadGameImage('assets/Buttons/Save.png', self.game.screenWidth // 12, self.game.screenWidth // 24),
 			"Clear" : loadGameImage('assets/Buttons/Clear.png', self.game.screenWidth // 12, self.game.screenWidth // 24),
 			"Back" : loadGameImage('assets/Buttons/Back.png', self.game.screenWidth // 12, self.game.screenWidth // 24),
-			"MusicOn" : loadGameImage('assets/Buttons/musicOn.png', self.game.screenWidth // 32, self.game.screenWidth // 32),
-			"MusicOff" : loadGameImage('assets/Buttons/musicOff.png', self.game.screenWidth // 32, self.game.screenWidth // 32),
-			"SoundOn" : loadGameImage('assets/Buttons/soundOn.png', self.game.screenWidth // 32, self.game.screenWidth // 32),
-			"SoundOff" : loadGameImage('assets/Buttons/soundOff.png', self.game.screenWidth // 32, self.game.screenWidth // 32),
+			"MusicOn" : loadGameImage('assets/Buttons/MusicOn.png', self.game.screenWidth // 32, self.game.screenWidth // 32),
+			"MusicOff" : loadGameImage('assets/Buttons/MusicOff.png', self.game.screenWidth // 32, self.game.screenWidth // 32),
+			"SoundOn" : loadGameImage('assets/Buttons/SoundOn.png', self.game.screenWidth // 32, self.game.screenWidth // 32),
+			"SoundOff" : loadGameImage('assets/Buttons/SoundOff.png', self.game.screenWidth // 32, self.game.screenWidth // 32),
 			"Lvl1" : loadGameImage('assets/Buttons/Lvl_1.png', self.game.screenWidth // 8, self.game.screenWidth // 16),
 			"Lvl2" : loadGameImage('assets/Buttons/Lvl_2.png', self.game.screenWidth // 8, self.game.screenWidth // 16),
 			"Lvl3" : loadGameImage('assets/Buttons/Lvl_3.png', self.game.screenWidth // 8, self.game.screenWidth // 16),
@@ -1244,11 +1244,11 @@ class Enemy(pygame.sprite.Sprite):
 		for animation in animationTypes:
 
 			tempList = []
-			framesNumber = len(os.listdir(f'assets/Enemy2/{animation}'))
+			framesNumber = len(os.listdir(f'assets/Enemy/{animation}'))
 
 			for c in range(framesNumber): # Loading all animations
 
-				gameImage = pygame.image.load(f'assets/Enemy2/{animation}/{c}.png').convert_alpha()
+				gameImage = pygame.image.load(f'assets/Enemy/{animation}/{c}.png').convert_alpha()
 				gameImage = pygame.transform.scale(gameImage, (self.game.screenWidth // 16, self.game.screenHeight // 10))
 				tempList.append(gameImage)
 
@@ -1502,7 +1502,7 @@ class Bullet(pygame.sprite.Sprite):
 		# Bullet Settings:
 
 		self.speed = (self.game.screenWidth // 32) // 5
-		self.image = loadGameImage('assets/Bullet/bullet.png', self.game.screenWidth // 200, self.game.screenWidth // 400)
+		self.image = loadGameImage('assets/Bullet/Bullet.png', self.game.screenWidth // 200, self.game.screenWidth // 400)
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 		self.direction = direction
@@ -1773,17 +1773,17 @@ class Resolution():
 
 		self.resolutionWindow = pygame.display.set_mode((300, 400))
 		pygame.display.set_caption("Land Invasion: ")
-		pygame.display.set_icon(loadGameImage('assets/icon.png', 32, 32))
+		pygame.display.set_icon(loadGameImage('assets/Icon.png', 32, 32))
 		self.resolutionStatus = True
 
 		# Background:
 
-		self.background = loadGameImage('assets/menu.png', 300, 400)
+		self.background = loadGameImage('assets/Menu.png', 300, 400)
 
 		# Buttons: 
 
-		self.resolutionA = Button(self.resolutionWindow, 80, 200, loadGameImage('assets/resolution/B.png', 150, 100)) # 1280 x 720
-		self.resolutionB = Button(self.resolutionWindow, 80, 50, loadGameImage('assets/resolution/A.png', 150, 100)) # 1920 x 1080
+		self.resolutionA = Button(self.resolutionWindow, 80, 200, loadGameImage('assets/Resolution/B.png', 150, 100)) # 1280 x 720
+		self.resolutionB = Button(self.resolutionWindow, 80, 50, loadGameImage('assets/Resolution/A.png', 150, 100)) # 1920 x 1080
 
 	def updateBackground(self):
 		self.resolutionWindow.fill((255, 255, 255))
@@ -1818,17 +1818,17 @@ class Graphics():
 
 		self.graphicsWindows = pygame.display.set_mode((300, 400))
 		pygame.display.set_caption("Land Invasion: ")
-		pygame.display.set_icon(loadGameImage('assets/icon.png', 32, 32))
+		pygame.display.set_icon(loadGameImage('assets/Icon.png', 32, 32))
 		self.graphicsStatus = True
 
 		# Background:
 
-		self.background = loadGameImage('assets/menu.png', 300, 400)
+		self.background = loadGameImage('assets/Menu.png', 300, 400)
 
 		# Buttons: 
 
-		self.effects = Button(self.graphicsWindows, 80, 50, loadGameImage('assets/graphics/AOn.png', 150, 100)) 
-		self.start = Button(self.graphicsWindows, 75, 250, loadGameImage('assets/graphics/start.png', 150, 100)) 
+		self.effects = Button(self.graphicsWindows, 80, 50, loadGameImage('assets/Graphics/AOn.png', 150, 100)) 
+		self.start = Button(self.graphicsWindows, 75, 250, loadGameImage('assets/Graphics/Start.png', 150, 100)) 
 
 	def updateBackground(self):
 		self.graphicsWindows.fill((255, 255, 255))
@@ -1847,11 +1847,11 @@ class Graphics():
 
 		if(self.game.effects):
 
-			self.effects.changeButton(loadGameImage('assets/graphics/AOn.png', 150, 100))
+			self.effects.changeButton(loadGameImage('assets/Graphics/AOn.png', 150, 100))
 
 		else:
 
-			self.effects.changeButton(loadGameImage('assets/graphics/AOff.png', 150, 100)) 
+			self.effects.changeButton(loadGameImage('assets/Graphics/AOff.png', 150, 100)) 
 
 
 		for event in pygame.event.get():
