@@ -866,6 +866,11 @@ class Player(pygame.sprite.Sprite):
 		self.footstepsPlaying = False
 		self.velocityY = 0
 
+		# Player Sound:
+
+		self.soundLength = 0
+		self.soundTime = pygame.time.get_ticks()
+
 		# Player Animation Variables:
 
 		self.flip = False
@@ -1016,9 +1021,20 @@ class Player(pygame.sprite.Sprite):
 			self.throwGrenade = False
 			self.grenadeThrown = False
 
+		if(self.soundLength == round(pygame.mixer.Sound.get_length(self.game.sounds.sounds['Footsteps']))):
+
+			self.game.sounds.playSound('Footsteps', 0.2)
+			self.soundLength = 0
+
+		if(pygame.time.get_ticks() - self.soundTime > 1000):
+
+			self.soundLength += 1
+			self.soundTime = pygame.time.get_ticks()
+
 		if(self.moving):
 
 			if(not self.footstepsPlaying):
+
 				self.game.sounds.playSound('Footsteps', 0.2)
 				self.footstepsPlaying = True
 
