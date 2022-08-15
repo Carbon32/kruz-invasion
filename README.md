@@ -1,7 +1,7 @@
 <h1 align="center">Land Invasion:</h1><br>
 
 <details>
-  <summary>Table of Contents: </summary>
+  <summary>Table of Contents:</summary>
   <ol>
     <li>
       <a href="#about">About</a>
@@ -45,14 +45,14 @@ The code is a bit messy, it will be improved soon enough.
 
 ## Installation:
 
-To be able to run Fort Defender, you need to have Pygame installed on your computer.
+To be able to run Land Invasion, you need to have Pygame installed on your computer.
 
 <b>NOTE:</b> Messing with directories may cause some unforeseen consequences...
 
 1. Clone the repository: 
 
    ```sh
-   git clone https://github.com/Carbon32/fort-defender.git
+   git clone https://github.com/Carbon32/land-invasion.git
    ```
 2. Install all necessary libraries:
 
@@ -70,9 +70,10 @@ To be able to run Fort Defender, you need to have Pygame installed on your compu
 
 ## Changelog:
 
-Changes made on: 07/30/2022
+Changes made on: 08/15/2022
 
-* Removed some unused code.
+* Fixed an issue with game sounds.
+* Fixed some issues with the documentation, took me so long to notice.
 
 ## License:
 
