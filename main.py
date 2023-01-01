@@ -7,7 +7,7 @@
 
 # Imports: #
 
-from engine import *
+from src.engine import *
 
 # Game: #
 
@@ -15,7 +15,7 @@ game = Game()
 
 # Sounds: #
 
-sounds = Sounds()
+sounds = Sounds(game)
 
 # Resolution: #
 
@@ -23,22 +23,17 @@ resolution = Resolution(game)
 
 # Resoltuion Selection: #
 
-while(resolution.resolutionStatus):
-
-    resolution.updateBackground()
-
-    if(resolution.resolutionA.render()):
-
-        resolution.setResolution(1280, 720)
+while(resolution.resolution_status):
+    resolution.update_background()
+    if(resolution.resolution_a.render()):
+        resolution.set_resolution(1280, 720)
         break
 
-    if(resolution.resolutionB.render()):
-
-        resolution.setResolution(1920, 1080)
-
+    if(resolution.resolution_b.render()):
+        resolution.set_resolution(1920, 1080)
         break
 
-    resolution.updateWindow()
+    resolution.update_window()
 
 # Graphics: #
 
@@ -46,23 +41,19 @@ graphics = Graphics(game)
 
 # Graphics Selection: #
 
-while(graphics.graphicsStatus):
-
-    graphics.updateBackground()
-
+while(graphics.graphics_status):
+    graphics.update_background()
     if(graphics.effects.render()):
-
-        graphics.setEffects()
+        graphics.set_effects()
 
     if(graphics.start.render()):
-
         break
 
-    graphics.updateWindow()
+    graphics.update_window()
 
 # Start Window:
 
-game.startWindow(sounds)
+game.start_window(sounds)
 
 # World:
 
@@ -70,15 +61,15 @@ world = World(game)
 
 # Assets Manager:
 
-assetsManager = AssetsManager(game)
+assets_manager = AssetsManager(game)
 
 # Menu: #
 
-menu = Menu(game, assetsManager)
+menu = Menu(game, assets_manager)
 
 # Editor:
 
-editor = Editor(game, world, assetsManager, menu)
+editor = Editor(game, world, assets_manager, menu)
 
 # User Interface:
 
@@ -90,55 +81,45 @@ particles = Particles(game)
 
 # Game Icon: 
 
-game.setGameIcon('assets/Player/Idle/0.png')
+game.set_game_icon('assets/Player/Idle/0.png')
 
 # Tiles:
 
-assetsManager.loadPickups()
-world.loadTiles()
+assets_manager.load_pickups()
+world.load_tiles()
 
 # World: #
 
-world.setGameLevel(1)
+world.set_game_level(1)
 
 # Fade In:
 
-gameFade = Fade(game, 1, ((0, 0, 0)))
+game_fade = Fade(game, 1, ((0, 0, 0)))
 
 # Game Loop: #
 
-while(game.engineRunning):
-
-	game.setBackground(assetsManager)
-
-	if(game.menuOn):
-
-		menu.handleMenu(world)
-		gameFade.reset()
-
+while(game.engine_running):
+	game.set_background(assets_manager)
+	if(game.menu_on):
+		menu.handle_menu(world)
+		game_fade.reset()
 	else:
-
-		if(game.editorStatus):
-
-			editor.generateEditorWorld()
-			editor.drawWorld()
-			editor.drawGrid()
-			editor.drawUserInterface()
-			editor.drawInformation()
-			editor.handleButtons()
-			if(gameFade.fade()):
-
-				editor.handleEditor()
-
+		if(game.editor_status):
+			editor.generate_editor_world()
+			editor.draw_world()
+			editor.draw_grid()
+			editor.draw_user_interface()
+			editor.draw_information()
+			editor.handle_buttons()
+			if(game_fade.fade()):
+				editor.handle_editor()
 		else:
+			game.update_game_mechanics(world, particles)
+			game.draw_game_sprites(world, ui)
+			particles.draw_game_particles()
+			menu.check_death(world)
+			if(game_fade.fade()):
+				game.start_game()
+				game.start_level()
 
-			game.updateGameMechanics(world, particles)
-			game.drawGameSprites(world, ui)
-			particles.drawParticles()
-			menu.checkDeath(world)
-			if(gameFade.fade()):
-
-				game.startGame()
-				game.startLevel()
-
-	game.updateDisplay(60)
+	game.update_display(60)
