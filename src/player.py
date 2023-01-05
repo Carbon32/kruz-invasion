@@ -312,6 +312,6 @@ class Player(pygame.sprite.Sprite):
 
     def render(self):
         self.game.display.blit(pygame.transform.flip(self.image, self.flip, False), (self.rect.x - self.x_collision, self.rect.y))
-        pygame.draw.rect(self.game.display, (250, 0, 0), (self.game.screen_width // 3, (self.game.screen_height // 4 - self.game.screen_height // 5), (self.rect.w * 3), self.game.screen_width // 80))
-        pygame.draw.rect(self.game.display, (0, 250, 0), (self.game.screen_width // 3, (self.game.screen_height // 4 - self.game.screen_height // 5), (self.rect.w * 3) * (self.health / self.max_health), self.game.screen_width // 80))
-        pygame.draw.rect(self.game.display, (0, 0, 0), (self.game.screen_width // 3, (self.game.screen_height // 4 - self.game.screen_height // 5),(self.rect.w * 3), self.game.screen_width // 80), 2)
+        pygame.draw.rect(self.game.display, (250, 0, 0), (self.game.screen_width // 3, self.game.screen_height // 18, (self.rect.w * 3), self.game.screen_width // 80), border_radius = self.game.screen_width // 128)
+        pygame.draw.rect(self.game.display, (0, 250, 0), (self.game.screen_width // 3, self.game.screen_height // 18, (self.rect.w * 3) * (self.health / self.max_health), self.game.screen_width // 80), border_radius = self.game.screen_width // 128)
+        pygame.draw.rect(self.game.display, (0, 0, 0), (self.game.screen_width // 3, self.game.screen_height // 18, (self.rect.w * 3), self.game.screen_width // 80), self.game.screen_width // (self.game.screen_width // 4), border_radius = self.game.screen_width // 128)

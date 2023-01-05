@@ -28,6 +28,15 @@ class Particles():
             'explosion_particles' : []
         }
 
+    def reset_particles(self):
+        self.particles = {
+            'run_particles' : [],
+            'blood_particles' : [],
+            'gun_particles' : [],
+            'jump_particles' : [],
+            'explosion_particles' : []
+        }
+        
     def add_game_particle(self, particle_type : str, x : int, y : int):
         particle_type.lower()
         if(particle_type == "gun"):

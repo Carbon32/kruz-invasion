@@ -44,7 +44,7 @@ class Game():
 
         # Scroll:
 
-        self.scroll_thresh = 300
+        self.scroll_thresh = 0
         self.screen_scroll = 0
         self.background_scroll = 0
 
@@ -100,6 +100,11 @@ class Game():
         self.engine_running = True
         self.engine_gravity = (self.screen_width // 300) * 0.1
         self.sounds = sounds
+        self.scroll_thresh = self.screen_width // 3
+        self.fonts = {
+            'large' : pygame.font.Font(os.getcwd() + '/game_font.ttf', self.screen_width // 20),
+            'small' : pygame.font.Font(os.getcwd() + '/game_font.ttf', self.screen_width // 48)
+        }
 
     def remove_all_sprites(self):
         self.enemy_group.empty()
@@ -159,7 +164,7 @@ class Game():
         return image
 
     def draw_text(self, text, size, color, x, y):
-        image = pygame.font.SysFont('System', size).render(text, True, color)
+        image = pygame.font.SysFont('', size).render(text, True, color)
         self.display.blit(image, (x, y))
         
     def update_game_mechanics(self, world, particles):
@@ -214,5 +219,5 @@ class Game():
             for explosion in self.explosion_group:
                 explosion.render()
 
-            self.player.render()
             ui.draw_stats()
+            self.player.render()

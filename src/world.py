@@ -16,11 +16,15 @@ from src.enemy import *
 # World: #
 
 class World():
-    def __init__(self, game):
+    def __init__(self, game, particles):
 
         # Game:
 
         self.game = game
+
+        # Particles:
+
+        self.particles = particles
 
         # Level Settings:
 
@@ -49,6 +53,7 @@ class World():
     def set_game_level(self, game_level):
         self.game.seconds = [0, 0]
         self.game.minutes = [0, 0]
+        self.particles.reset_particles()
         if(game_level > 6):
             game_level = 1
 

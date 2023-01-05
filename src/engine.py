@@ -41,8 +41,8 @@ class Resolution():
 
         # Buttons: 
 
-        self.resolution_a = Button(self.resolution_window, 80, 200, self.game.load_game_image('assets/Resolution/B.png', 150, 100)) # 1280 x 720
-        self.resolution_b = Button(self.resolution_window, 80, 50, self.game.load_game_image('assets/Resolution/A.png', 150, 100)) # 1920 x 1080
+        self.resolution_a = ButtonImage(self.resolution_window, self.game.load_game_image('assets/Resolution/B.png', 150, 100), 55, 200, 200, 100, 10, 50) # 1280 x 720
+        self.resolution_b = ButtonImage(self.resolution_window, self.game.load_game_image('assets/Resolution/A.png', 150, 100), 55, 50, 200, 100, 10, 50) # 1920 x 1080
 
     def update_background(self):
         self.resolution_window.fill((255, 255, 255))
@@ -52,6 +52,7 @@ class Resolution():
         self.game.screen_width = screen_width
         self.game.screen_height = screen_height
         self.resolution_status = False
+
 
     def update_window(self):
         for event in pygame.event.get():
@@ -74,6 +75,7 @@ class Graphics():
 
         self.graphics_window = pygame.display.set_mode((300, 400))
         self.graphics_status = True
+        pygame.display.set_icon(self.game.load_game_image('assets/Icon.png', 32, 32))
 
         # Background:
 
@@ -81,8 +83,8 @@ class Graphics():
 
         # Buttons: 
 
-        self.effects = Button(self.graphics_window, 80, 50, self.game.load_game_image('assets/Graphics/AOn.png', 150, 100)) 
-        self.start = Button(self.graphics_window, 75, 250, self.game.load_game_image('assets/Graphics/Start.png', 150, 100)) 
+        self.effects = ButtonImage(self.graphics_window, self.game.load_game_image('assets/Graphics/AOn.png', 150, 100), 55, 50, 200, 100, 10, 50) 
+        self.start = ButtonImage(self.graphics_window, self.game.load_game_image('assets/Graphics/Start.png', 150, 100), 55, 250, 200, 100, 10, 50) 
 
     def update_background(self):
         self.graphics_window.fill((255, 255, 255))

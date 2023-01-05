@@ -61,9 +61,9 @@ class Editor():
         
         # Buttons:
 
-        self.save_button = Button(self.game.display, self.game.screen_width // 2 - (self.game.screen_width // 18), self.game.screen_height - (self.game.screen_height // 12), self.assets_manager.buttons["Save"])
-        self.clear_button = Button(self.game.display, self.game.screen_width // 2 - (self.game.screen_width // 3), self.game.screen_height - (self.game.screen_height // 12), self.assets_manager.buttons["Clear"])
-        self.back_button = Button(self.game.display, self.game.screen_width // 2 - (self.game.screen_width // 5), self.game.screen_height - (self.game.screen_height // 12), self.assets_manager.buttons["Back"])
+        self.save_button = ButtonText(self.game, 'Save', self.game.screen_width // 2 - (self.game.screen_width // 18), self.game.screen_height - (self.game.screen_height // 12), self.game.screen_width // 12, self.game.screen_width // 24, self.game.screen_width // 180, 'small')
+        self.clear_button = ButtonText(self.game, 'Clear', self.game.screen_width // 2 - (self.game.screen_width // 3), self.game.screen_height - (self.game.screen_height // 12), self.game.screen_width // 12, self.game.screen_width // 24, self.game.screen_width // 180, 'small')
+        self.back_button = ButtonText(self.game, 'Back', self.game.screen_width // 2 - (self.game.screen_width // 5), self.game.screen_height - (self.game.screen_height // 12), self.game.screen_width // 12, self.game.screen_width // 24, self.game.screen_width // 180, 'small')
 
         # Timers:
 
@@ -102,7 +102,7 @@ class Editor():
         pygame.draw.rect(self.game.display, ((140, 146, 172)), self.lower_margin)
         if(self.interface_ready == False):
             for i in range(len(self.world.available_tiles)):
-                tile_button = Button(self.game.display, self.game.screen_width - ((self.game.screen_width // 20) * self.tile_column) - (self.game.screen_width // 16), ((self.game.screen_width // 25) * self.tile_row) + (self.game.screen_height // 20), self.world.available_tiles[i])
+                tile_button = ButtonTile(self.game.display, self.game.screen_width - ((self.game.screen_width // 20) * self.tile_column) - (self.game.screen_width // 16), ((self.game.screen_width // 25) * self.tile_row) + (self.game.screen_height // 20), self.world.available_tiles[i])
                 self.tile_buttons.append(tile_button)
                 self.tile_column += 1
                 if self.tile_column == 4:

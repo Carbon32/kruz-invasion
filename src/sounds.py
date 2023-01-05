@@ -36,7 +36,6 @@ class Sounds():
             'Hit2' : self.game.load_game_sound('sounds/hit/hit_2.ogg'),
             'Hit3' : self.game.load_game_sound('sounds/hit/hit_3.ogg'),
             'Hit4' : self.game.load_game_sound('sounds/hit/hit_4.ogg'),
-            'Intro' : self.game.load_game_sound('sounds/intro/intro.ogg'),
             'Jump1' : self.game.load_game_sound('sounds/jump/jump_1.ogg'),
             'Jump2' : self.game.load_game_sound('sounds/jump/jump_2.ogg'),
             'HealthPickup' : self.game.load_game_sound('sounds/pickup/health_pickup.ogg'),

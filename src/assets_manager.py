@@ -42,24 +42,10 @@ class AssetsManager():
         # Buttons:
 
         self.buttons = {
-            "Play" : self.game.load_game_image('assets/Buttons/Play.png', self.game.screen_width // 6, self.game.screen_width // 12),
-            "Editor" : self.game.load_game_image('assets/Buttons/Editor.png', self.game.screen_width // 6, self.game.screen_width // 12),
-            "Exit" : self.game.load_game_image('assets/Buttons/Exit.png', self.game.screen_width // 6, self.game.screen_width // 12),
-            "Again" : self.game.load_game_image('assets/Buttons/Again.png', self.game.screen_width // 6, self.game.screen_width // 12),
-            "Select" : self.game.load_game_image('assets/Buttons/Select.png', self.game.screen_width // 6, self.game.screen_width // 12),
-            "Save" : self.game.load_game_image('assets/Buttons/Save.png', self.game.screen_width // 12, self.game.screen_width // 24),
-            "Clear" : self.game.load_game_image('assets/Buttons/Clear.png', self.game.screen_width // 12, self.game.screen_width // 24),
-            "Back" : self.game.load_game_image('assets/Buttons/Back.png', self.game.screen_width // 12, self.game.screen_width // 24),
-            "MusicOn" : self.game.load_game_image('assets/Buttons/MusicOn.png', self.game.screen_width // 32, self.game.screen_width // 32),
-            "MusicOff" : self.game.load_game_image('assets/Buttons/MusicOff.png', self.game.screen_width // 32, self.game.screen_width // 32),
-            "SoundOn" : self.game.load_game_image('assets/Buttons/SoundOn.png', self.game.screen_width // 32, self.game.screen_width // 32),
-            "SoundOff" : self.game.load_game_image('assets/Buttons/SoundOff.png', self.game.screen_width // 32, self.game.screen_width // 32),
-            "Lvl1" : self.game.load_game_image('assets/Buttons/Lvl_1.png', self.game.screen_width // 8, self.game.screen_width // 16),
-            "Lvl2" : self.game.load_game_image('assets/Buttons/Lvl_2.png', self.game.screen_width // 8, self.game.screen_width // 16),
-            "Lvl3" : self.game.load_game_image('assets/Buttons/Lvl_3.png', self.game.screen_width // 8, self.game.screen_width // 16),
-            "Lvl4" : self.game.load_game_image('assets/Buttons/Lvl_4.png', self.game.screen_width // 8, self.game.screen_width // 16),
-            "Lvl5" : self.game.load_game_image('assets/Buttons/Lvl_5.png', self.game.screen_width // 8, self.game.screen_width // 16),
-            "Lvl6" : self.game.load_game_image('assets/Buttons/Lvl_6.png', self.game.screen_width // 8, self.game.screen_width // 16)
+            "MusicOn" : self.game.load_game_image('assets/Buttons/MusicOn.png', self.game.screen_width // 64, self.game.screen_width // 64),
+            "MusicOff" : self.game.load_game_image('assets/Buttons/MusicOff.png', self.game.screen_width // 64, self.game.screen_width // 64),
+            "SoundOn" : self.game.load_game_image('assets/Buttons/SoundOn.png', self.game.screen_width // 64, self.game.screen_width // 64),
+            "SoundOff" : self.game.load_game_image('assets/Buttons/SoundOff.png', self.game.screen_width // 64, self.game.screen_width // 64)
         }
 
     def load_pickups(self):

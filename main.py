@@ -55,9 +55,13 @@ while(graphics.graphics_status):
 
 game.start_window(sounds)
 
+# Particles:
+
+particles = Particles(game)
+
 # World:
 
-world = World(game)
+world = World(game, particles)
 
 # Assets Manager:
 
@@ -75,10 +79,6 @@ editor = Editor(game, world, assets_manager, menu)
 
 ui = UserInterface(game)
 
-# Particles:
-
-particles = Particles(game)
-
 # Game Icon: 
 
 game.set_game_icon('assets/Player/Idle/0.png')
@@ -94,7 +94,8 @@ world.set_game_level(1)
 
 # Fade In:
 
-game_fade = Fade(game, 1, ((0, 0, 0)))
+start_fade = Fade(game, 1, ((0, 0, 0)))
+end_fade = Fade(game, 2, ((0, 0, 0)))
 
 # Game Loop: #
 
@@ -102,7 +103,7 @@ while(game.engine_running):
 	game.set_background(assets_manager)
 	if(game.menu_on):
 		menu.handle_menu(world)
-		game_fade.reset()
+		start_fade.reset()
 	else:
 		if(game.editor_status):
 			editor.generate_editor_world()
@@ -111,14 +112,14 @@ while(game.engine_running):
 			editor.draw_user_interface()
 			editor.draw_information()
 			editor.handle_buttons()
-			if(game_fade.fade()):
+			if(start_fade.fade()):
 				editor.handle_editor()
 		else:
 			game.update_game_mechanics(world, particles)
 			game.draw_game_sprites(world, ui)
 			particles.draw_game_particles()
-			menu.check_death(world)
-			if(game_fade.fade()):
+			menu.check_death(world, start_fade, end_fade)
+			if(start_fade.fade()):
 				game.start_game()
 				game.start_level()
 

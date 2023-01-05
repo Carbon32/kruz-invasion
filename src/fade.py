@@ -39,7 +39,7 @@ class Fade():
             pygame.draw.rect(self.game.display, self.color, (0, self.game.screen_height // 2 + self.fade_counter, self.game.screen_width, self.game.screen_height))
 
         if(self.direction == 2):
-            pygame.draw.rect(self.game.display, self.color, (0, 0, screen_width, 0 + self.fade_counter))
+            pygame.draw.rect(self.game.display, self.color, (0, 0, self.game.screen_width, 0 + self.fade_counter))
         
         if(self.fade_counter >= self.game.screen_width // 2):
             self.fade_completed = True
