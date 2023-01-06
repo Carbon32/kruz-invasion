@@ -38,9 +38,9 @@ class Pickup(pygame.sprite.Sprite):
         if(pygame.sprite.collide_rect(self, self.game.player) and self.used == False and self.game.player.alive):
             if(self.type == 'Ammo'):
                 self.image = self.game.pickups['AmmoShine']
-                pygame.draw.rect(self.game.display, (67, 131, 226), pygame.Rect(self.game.screen_width // 32, self.game.screen_height // 12, self.game.screen_width // 4, self.game.screen_width // 18))
-                pygame.draw.rect(self.game.display, (0, 0, 0), pygame.Rect(self.game.screen_width // 32, self.game.screen_height // 12, self.game.screen_width // 4, self.game.screen_width // 18), self.game.screen_width // (self.game.screen_width // 12))
-                self.game.draw_text("Press 'F' to open the bag (+7 Bullets).", self.game.screen_width // 64, (0, 0, 0), self.game.screen_width // 20, self.game.screen_height // 8)
+                pygame.draw.rect(self.game.display, (67, 131, 226), pygame.Rect(self.game.screen_width // 32, self.game.screen_height // 8, self.game.screen_width // 4, self.game.screen_width // 18), border_radius = self.game.screen_width // 38)
+                pygame.draw.rect(self.game.display, (0, 0, 0), pygame.Rect(self.game.screen_width // 32, self.game.screen_height // 8, self.game.screen_width // 4, self.game.screen_width // 18), self.game.screen_width // (self.game.screen_width // 12), border_radius = self.game.screen_width // 38)
+                self.game.draw_text("Press 'F' to open the bag (+7 Bullets).", self.game.screen_width // 64, (0, 0, 0), self.game.screen_width // 20, self.game.screen_height // 6)
                 if(pygame.key.get_pressed()[pygame.K_f]):
                     self.game.ammo += 7
                     if(self.game.player.current_ammo == 0 and self.game.ammo == 7):
@@ -51,9 +51,9 @@ class Pickup(pygame.sprite.Sprite):
 
             elif(self.type == 'Health'):
                 self.image = self.game.pickups['HealthShine']
-                pygame.draw.rect(self.game.display, (67, 131, 226), pygame.Rect(self.game.screen_width // 32, self.game.screen_height // 12, self.game.screen_width // 4, self.game.screen_width // 18))
-                pygame.draw.rect(self.game.display, (0, 0, 0), pygame.Rect(self.game.screen_width // 32, self.game.screen_height // 12, self.game.screen_width // 4, self.game.screen_width // 18), self.game.screen_width // (self.game.screen_width // 12))
-                self.game.draw_text("Press 'F' to use the medicine (+50 Health).", self.game.screen_width // 64, (0, 0, 0), self.game.screen_width // 20, self.game.screen_height // 8)
+                pygame.draw.rect(self.game.display, (67, 131, 226), pygame.Rect(self.game.screen_width // 32, self.game.screen_height // 8, self.game.screen_width // 4, self.game.screen_width // 18), border_radius = self.game.screen_width // 38)
+                pygame.draw.rect(self.game.display, (0, 0, 0), pygame.Rect(self.game.screen_width // 32, self.game.screen_height // 8, self.game.screen_width // 4, self.game.screen_width // 18), self.game.screen_width // (self.game.screen_width // 12), border_radius = self.game.screen_width // 38)
+                self.game.draw_text("Press 'F' to use the medicine (+50 Health).", self.game.screen_width // 64, (0, 0, 0), self.game.screen_width // 20, self.game.screen_height // 6)
                 if(pygame.key.get_pressed()[pygame.K_f]):
                     self.game.player.health += 50
                     if(self.game.player.health > self.game.player.max_health):
@@ -63,9 +63,9 @@ class Pickup(pygame.sprite.Sprite):
 
             elif(self.type == 'Grenade'):
                 self.image = self.game.pickups['GrenadeShine']
-                pygame.draw.rect(self.game.display, (67, 131, 226), pygame.Rect(self.game.screen_width // 32, self.game.screen_height // 12, self.game.screen_width // 4, self.game.screen_width // 18))
-                pygame.draw.rect(self.game.display, (0, 0, 0), pygame.Rect(self.game.screen_width // 32, self.game.screen_height // 12, self.game.screen_width // 4, self.game.screen_width // 18), self.game.screen_width // (self.game.screen_width // 12))
-                self.game.draw_text("Press 'F' to open the chest (+3 Grenades).", self.game.screen_width // 64, (0, 0, 0), self.game.screen_width // 20, self.game.screen_height // 8)
+                pygame.draw.rect(self.game.display, (67, 131, 226), pygame.Rect(self.game.screen_width // 32, self.game.screen_height // 8, self.game.screen_width // 4, self.game.screen_width // 18), border_radius = self.game.screen_width // 38)
+                pygame.draw.rect(self.game.display, (0, 0, 0), pygame.Rect(self.game.screen_width // 32, self.game.screen_height // 8, self.game.screen_width // 4, self.game.screen_width // 18), self.game.screen_width // (self.game.screen_width // 12), border_radius = self.game.screen_width // 38)
+                self.game.draw_text("Press 'F' to open the chest (+3 Grenades).", self.game.screen_width // 64, (0, 0, 0), self.game.screen_width // 20, self.game.screen_height // 6)
                 if(pygame.key.get_pressed()[pygame.K_f]):
                     self.game.grenades += 3
                     self.used = True

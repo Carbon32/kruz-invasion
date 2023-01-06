@@ -39,14 +39,19 @@ class Menu():
         self.selected_level = 0
         self.border = pygame.Rect(0, 0, 0, 0)
 
+        # Title:
+
+        self.step = 0
+        self.title_background_color = (184, 160, 238)
+
         # Buttons: #
 
-        self.play_button = ButtonText(self.game, 'Play', self.game.screen_width // 2 - (self.game.screen_width // 10), self.game.screen_height // 2 - (self.game.screen_height // 3), self.game.screen_width // 4, self.game.screen_width // 12, self.game.screen_width // 80, 'large')
-        self.editor_button = ButtonText(self.game, 'Editor', self.game.screen_width // 2 - (self.game.screen_width // 10), self.game.screen_height // 2 - (self.game.screen_height // 7), self.game.screen_width // 4, self.game.screen_width // 12, self.game.screen_width // 80, 'large')
-        self.exit_button = ButtonText(self.game, 'Exit', self.game.screen_width // 2 - (self.game.screen_width // 10), self.game.screen_height // 3 + (self.game.screen_height // 4.5), self.game.screen_width // 4, self.game.screen_width // 12, self.game.screen_width // 80, 'large')
+        self.play_button = ButtonText(self.game, 'Play', self.game.screen_width // 2 - (self.game.screen_width // 10), self.game.screen_height // 2 - (self.game.screen_height // 6), self.game.screen_width // 4, self.game.screen_width // 12, self.game.screen_width // 80, 'large')
+        self.editor_button = ButtonText(self.game, 'Editor', self.game.screen_width // 2 - (self.game.screen_width // 10), self.game.screen_height // 3 + (self.game.screen_height // 5), self.game.screen_width // 4, self.game.screen_width // 12, self.game.screen_width // 80, 'large')
+        self.exit_button = ButtonText(self.game, 'Exit', self.game.screen_width // 2 - (self.game.screen_width // 10), self.game.screen_height // 3 + (self.game.screen_height // 2.5), self.game.screen_width // 4, self.game.screen_width // 12, self.game.screen_width // 80, 'large')
         self.again_button = ButtonText(self.game, 'Again', self.game.screen_width // 2 - (self.game.screen_width // 16), self.game.screen_height // 2 - (self.game.screen_height // 4), self.game.screen_width // 6, self.game.screen_width // 12, self.game.screen_width // 80, 'large')
         self.select_button = ButtonText(self.game, 'Select', self.game.screen_width // 4 + (self.game.screen_width // 4), self.game.screen_height // 2 + (self.game.screen_height // 4), self.game.screen_width // 6, self.game.screen_width // 12, self.game.screen_width // 80, 'large')
-        self.back_button = ButtonText(self.game, 'Back', self.game.screen_width // 2 - (self.game.screen_width // 16),  self.game.screen_height // 3 + (self.game.screen_height // 2), self.game.screen_width // 6, self.game.screen_width // 12, self.game.screen_width // 80, 'large')
+        self.back_button = ButtonText(self.game, 'Back', self.game.screen_width // 2 - (self.game.screen_width // 64),  self.game.screen_height // 2.9 + (self.game.screen_height // 1.8), self.game.screen_width // 14, self.game.screen_width // 20, self.game.screen_width // 256, 'small')
         self.music_button = ButtonImage(self.game.display, self.assets_manager.buttons["MusicOn"], self.game.screen_width // 2 + (self.game.screen_width // 2.3), self.game.screen_height // 2 - (self.game.screen_height // 2.1), self.game.screen_width // 32, self.game.screen_width // 32, self.game.screen_width // 256, self.game.screen_width // 64)
         self.sound_button = ButtonImage(self.game.display, self.assets_manager.buttons["SoundOn"], self.game.screen_width // 2 + (self.game.screen_width // 2.8), self.game.screen_height // 2 - (self.game.screen_height // 2.1), self.game.screen_width // 32, self.game.screen_width // 32, self.game.screen_width // 256, self.game.screen_width // 64)
 
@@ -67,6 +72,12 @@ class Menu():
             self.game.game_ready = False
 
         if(self.main_menu):
+            bounce = -1 * math.sin(self.step) * self.game.screen_width // 64
+            pygame.draw.rect(self.game.display, self.title_background_color, pygame.Rect(self.game.screen_width // 3.7, self.game.screen_height // 24 + bounce, self.game.screen_width - (self.game.screen_width // 2), self.game.screen_height // 5), border_radius = self.game.screen_width // 38)
+            pygame.draw.rect(self.game.display, (0, 0, 0), pygame.Rect(self.game.screen_width // 3.7, self.game.screen_height // 24 + bounce, self.game.screen_width - (self.game.screen_width // 2), self.game.screen_height // 5), self.game.screen_width // 128, border_radius = self.game.screen_width // 38)
+            self.game.draw_custom_text(self.game.fonts['huge'], 'Land Invasion', (0, 0, 0), self.game.screen_width // 3.3, (0 + self.game.screen_height // 12) + bounce)
+            
+            self.step += 0.05
             if(self.game.level_started):
                 if(self.back_button.render()):
                     self.level_selector = False

@@ -102,6 +102,7 @@ class Game():
         self.sounds = sounds
         self.scroll_thresh = self.screen_width // 3
         self.fonts = {
+            'huge' : pygame.font.Font(os.getcwd() + '/game_font.ttf', self.screen_width // 14),
             'large' : pygame.font.Font(os.getcwd() + '/game_font.ttf', self.screen_width // 20),
             'small' : pygame.font.Font(os.getcwd() + '/game_font.ttf', self.screen_width // 48)
         }
@@ -165,6 +166,10 @@ class Game():
 
     def draw_text(self, text, size, color, x, y):
         image = pygame.font.SysFont('', size).render(text, True, color)
+        self.display.blit(image, (x, y))
+
+    def draw_custom_text(self, font, text, color, x, y):
+        image = font.render(text, True, color)
         self.display.blit(image, (x, y))
         
     def update_game_mechanics(self, world, particles):
