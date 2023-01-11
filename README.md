@@ -67,6 +67,7 @@ To be able to run Land Invasion, you need to have Pygame installed on your compu
 <a href="https://blackdragon1727.itch.io">blackdragon1727 (Bullet Sprite)</a><br>
 <a href="https://xyezawr.itch.io">XYEzawr (Explosion)</a><br>
 <a href="https://opengameart.org/users/david-harrington">David Harrington (Old Sprite)</a><br>
+<a href="https://www.dafont.com/happy-4.font">Graphix Line Studio (Font)</a><br>
 
 ## Changelog:
 
