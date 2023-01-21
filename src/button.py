@@ -150,13 +150,10 @@ class ButtonText():
                 if(pygame.time.get_ticks() - self.click_time > 100):
                     self.action = False
                     return True
+
     def change_color(self, first_color, second_color):
         self.top_color = first_color
         self.bottom_color = second_color
-
-    def change_text(self, text):
-        self.text_surface = self.game.game_font.render(text, True, (255, 255, 255))
-        self.text_rect = self.text_surface.get_rect(center = self.top_rect.center)
         
 class ButtonTile():
     def __init__(self, display, x, y, image):

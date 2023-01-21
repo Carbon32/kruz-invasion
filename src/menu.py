@@ -167,4 +167,4 @@ class Menu():
                 world.restart_level()
 
     def update_background(self):
-        self.game.display.blit(self.assets_manager.menu_background, (0, 0))
+        self.game.display.fill((40, 42, 53))

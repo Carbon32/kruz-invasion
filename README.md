@@ -71,10 +71,10 @@ To be able to run Land Invasion, you need to have Pygame installed on your compu
 
 ## Changelog:
 
-Changes made on: 01/06/2023
+Changes made on: 01/22/2023
 
-* Added a bunch of fixes & changes (new buttons, menu, user interface...)
-* Removed some unused sprites & images
+* Removed some unused code parts
+* Changed background color
 
 ## License:
 
