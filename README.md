@@ -22,7 +22,7 @@
 
 ## About:
 
-<img src = "https://i.imgur.com/TWScYU9.png" width = 960 height = 540>
+<img src = "https://i.imgur.com/TWScYU9.png" width = 100% height = 100%>
 
 
 This is a Platformer/Shooter video game, made in Python. The engine is able to handle a lot of tasks including: 
@@ -71,10 +71,9 @@ To be able to run Land Invasion, you need to have Pygame installed on your compu
 
 ## Changelog:
 
-Changes made on: 01/22/2023
+Changes made on: 02/05/2023
 
-* Removed some unused code parts
-* Changed background color
+* Better documentation
 
 ## License:
 
